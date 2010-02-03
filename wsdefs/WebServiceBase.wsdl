@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:tns="TARGET_NAME_SPACE"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="MY_SERVICE"
+	targetNamespace="TARGET_NAME_SPACE">
+	<!-- xmlns:wsoap="http://www.w3.org/ns/wsdl/soap"  --> 
+	<wsdl:types>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			targetNamespace="TARGET_NAME_SPACE">
+		</xsd:schema>
+	</wsdl:types>
+
+	<wsdl:portType name="MY_SERVICE">
+	</wsdl:portType>
+
+<!-- wsoap:version="1.1" wsoap:protocol="http://www.w3.org/2006/01/soap11/bindings/HTTP/"  -->
+	<wsdl:binding name="MY_SERVICESOAP" type="tns:MY_SERVICE"
+		>
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+	</wsdl:binding>
+
+	<wsdl:service name="MY_SERVICE">
+		<wsdl:port binding="tns:MY_SERVICESOAP" name="MY_SERVICESOAP">
+			<soap:address location="MY_FQDN/webservices/MY_MODULE/MY_SERVICE" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

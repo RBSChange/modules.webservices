@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<module>
+		<enabled>true</enabled>
+		<visible>false</visible>
+		<icon>package</icon>
+		<usetopic>false</usetopic>
+	</module>
+	<projectconfig>
+		<modules>
+			<samples>
+				<webservices>
+					<shop>
+						<entry name="class">samples_ShopWebService</entry>
+						<entry name="login">admin</entry>
+						<entry name="password">password</entry>
+					</shop>
+				</webservices>
+			</samples>
+		</modules>
+	</projectconfig>
+</config>
