@@ -13,30 +13,11 @@ class webservices_ServerAction extends f_action_BaseAction
 	public function _execute($context, $request)
 	{
 		$soapRequest = file_get_contents("php://input");
-		if (Framework::isDebugEnabled())
-		{
-			Framework::debug("REQUEST SOAP ".var_export(apache_request_headers(), true)."\n".var_export($soapRequest, true));
-		}
 		$moduleName = $request->getModuleParameter('webservices', 'moduleName');
 		$serviceName = $request->getModuleParameter('webservices', 'serviceName');
-		$serviceConf = Framework::getConfiguration("modules/$moduleName/webservices/$serviceName", false);
-		if (!$serviceConf)
-		{
-			throw new Exception("Service not found");
-		}
-
-		if (!isset($serviceConf["class"]))
-		{
-			throw new Exception("Bad service configuration");
-		}
-		$className = $serviceConf["class"];
-		$class = new ReflectionClass($className);
-		if (!$class->implementsInterface("webservices_WebService"))
-		{
-			throw new Exception("Bad service class");
-		}
-
-		$isSecured = isset($serviceConf["login"]);
+		$className = $moduleName . "_" . ucfirst($serviceName) . "WebService";
+		
+		$secureId = webservices_WsService::getInstance()->getSecureExcuteByClass($className);
 
 		if ($request->hasParameter("wsdl") || $request->hasParameter("WSDL"))
 		{
@@ -47,34 +28,27 @@ class webservices_ServerAction extends f_action_BaseAction
 			return null;
 		}
 
-		if ($isSecured)
+		if ($secureId > 0)
 		{
-			// Digest authentication
+			// Basic authentication
 			$realm = "Please provide an admin/password couple for $serviceName service";
-
-			if (!isset($_SERVER['PHP_AUTH_DIGEST']))
+			if (!isset($_SERVER['PHP_AUTH_USER']))
 			{
 				return $this->mustLogin($realm);
 			}
-				
-			$users = array($serviceConf['login'] => $serviceConf['password']);
-
-			// analyze the PHP_AUTH_DIGEST variable
-			if (!($data = $this->http_digest_parse($_SERVER['PHP_AUTH_DIGEST'])) ||
-			!isset($users[$data['username']]))
+			$login = $_SERVER['PHP_AUTH_USER'];
+			$password = $_SERVER['PHP_AUTH_PW'];
+			
+			$user = users_UserService::getInstance()->getIdentifiedBackendUser($login, $password);
+			if ($user === null)
 			{
 				return $this->mustLogin($realm);
 			}
-
-			// generate the valid response
-			$A1 = md5($data['username'] . ':' . $realm . ':' . $users[$data['username']]);
-			$A2 = md5($_SERVER['REQUEST_METHOD'].':'.$data['uri']);
-			$valid_response = md5($A1.':'.$data['nonce'].':'.$data['nc'].':'.$data['cnonce'].':'.$data['qop'].':'.$A2);
-
-			if ($data['response'] != $valid_response)
+			if (!f_permission_PermissionService::getInstance()->hasPermission($user, 'modules_webservices.Execute', $secureId))
 			{
 				return $this->mustLogin($realm);
 			}
+			
 		}
 
 		if (Framework::inDevelopmentMode())
@@ -122,30 +96,9 @@ class webservices_ServerAction extends f_action_BaseAction
 		return webservices_ModuleService::getInstance()->getWsdl($webserviceClassName);
 	}
 
-	private function http_digest_parse($txt)
-	{
-		// protect against missing data
-		$needed_parts = array('nonce'=>1, 'nc'=>1, 'cnonce'=>1, 'qop'=>1, 'username'=>1, 'uri'=>1, 'response'=>1);
-		$data = array();
-		$keys = implode('|', array_keys($needed_parts));
-
-		if (!preg_match_all('@(' . $keys . ')=(?:([\'"])([^\2]+?)\2|([^\s,]+))@', $txt, $matches, PREG_SET_ORDER))
-		{
-			return false;
-		}
-
-		foreach ($matches as $m) {
-			$data[$m[1]] = $m[3] ? $m[3] : $m[4];
-			unset($needed_parts[$m[1]]);
-		}
-
-		return $needed_parts ? false : $data;
-	}
-
 	private function mustLogin($realm)
 	{
 		header('HTTP/1.1 401 Unauthorized');
-		header('WWW-Authenticate: Digest realm="'.$realm.
-           '",qop="auth",nonce="'.uniqid().'",opaque="'.md5($realm).'"');
+		header('WWW-Authenticate: Basic realm="'.$realm.'"');
 	}
 }

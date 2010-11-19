@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<i18n baseKey="m.webservices.bo.useractionlogger" lcid="fr_FR">
+  <key id="activate-ws">activate.ws {documentlabel}</key>
+  <key id="log-activate-ws">log activate ws</key>
+  <key id="deactivated-ws">deactivated.ws {documentlabel}</key>
+  <key id="log-deactivated-ws">log deactivated ws</key>
+  <key id="reactivate-ws">reactivate.ws {documentlabel}</key>
+  <key id="log-reactivate-ws">log reactivate ws</key>
+  <key id="delete-ws">delete.ws {documentlabel}</key>
+  <key id="log-delete-ws">log delete ws</key>
+  <key id="insert-ws">insert.ws {documentlabel}</key>
+  <key id="log-insert-ws">log insert ws</key>
+  <key id="update-ws">update.ws {documentlabel}</key>
+  <key id="log-update-ws">log update ws</key>
+  <key id="savepermissions-rootfolder">savepermissions.rootfolder {documentlabel}</key>
+  <key id="log-savepermissions-rootfolder">log savepermissions rootfolder</key>
+</i18n>

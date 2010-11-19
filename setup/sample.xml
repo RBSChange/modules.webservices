@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<script>
+	<binding fileName="modules/webservices/persistentdocument/import/webservices_binding.xml" />
+
+	<rootfolder module="webservices">
+		<folder byLabel="Exemples">
+			<ws label="Exemple catalogue" byPhpclass="samples_ShopWebService" secured="true" />
+		</folder>
+	</rootfolder>
+</script>

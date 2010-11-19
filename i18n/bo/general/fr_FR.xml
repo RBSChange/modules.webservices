@@ -3,4 +3,6 @@
   <key id="module-name">webservices</key>
   <key id="tree-root-name">webservices</key>
   <key id="system-folder-name">webservices</key>
+  <key id="compiled-succefully">Le web service "{label}" à été compilé avec succés</key>
+  <key id="compiled-error">Erreur lors de la compilation</key>
 </i18n>

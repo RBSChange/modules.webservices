@@ -38,14 +38,13 @@ class webservices_ModuleService extends ModuleBaseService
 	 */
 	function getWsdlPath($className)
 	{
+		$path = f_util_FileUtils::buildChangeBuildPath("wsdl", str_replace("_", DIRECTORY_SEPARATOR, $className) . ".wsdl");
 		if (Framework::inDevelopmentMode())
 		{
-			$path = f_util_FileUtils::buildCachePath("wsdl", str_replace("_", DIRECTORY_SEPARATOR, $className));
 			$wsdl = $this->generateWsdl($className);
 			f_util_FileUtils::writeAndCreateContainer($path, $wsdl, f_util_FileUtils::OVERRIDE);
-			return $path;
 		}
-		return f_util_FileUtils::buildChangeBuildPath("wsdl", str_replace("_", DIRECTORY_SEPARATOR, $className));
+		return $path;
 	}
 	
 	/**
@@ -53,25 +52,22 @@ class webservices_ModuleService extends ModuleBaseService
 	 */
 	function compileWsdls()
 	{
-		$modules = Framework::getConfiguration("modules");
-		foreach ($modules as $moduleEntry)
+		$wss = webservices_WsService::getInstance()->createQuery()->find();
+		foreach ($wss as $ws) 
 		{
-			if (isset($moduleEntry["webservices"]))
-			{
-				foreach ($moduleEntry["webservices"] as $webserviceName => $webserviceEntry)
-				{
-					if (!isset($webserviceEntry["class"]) || !f_util_ClassUtils::classExists($webserviceEntry["class"]))
-					{
-						throw new Exception("Invalid webservice class : ".$webserviceEntry["class"]);
-						
-					}
-					$className = $webserviceEntry["class"];
-					$path = f_util_FileUtils::buildChangeBuildPath("wsdl", str_replace("_", DIRECTORY_SEPARATOR, $className));
-					$wsdl = $this->generateWsdl($className);
-					f_util_FileUtils::writeAndCreateContainer($path, $wsdl, f_util_FileUtils::OVERRIDE);
-				}
-			}
+			$this->compileWsdl($ws->getPhpclass());
 		}
+	}
+	
+	/**
+	 * @param string $className
+	 */
+	function compileWsdl($className)
+	{
+		Framework::info(__METHOD__ . " " . $className);
+		$path = f_util_FileUtils::buildChangeBuildPath("wsdl", str_replace("_", DIRECTORY_SEPARATOR, $className) . ".wsdl");
+		$wsdl = $this->generateWsdl($className);
+		f_util_FileUtils::writeAndCreateContainer($path, $wsdl, f_util_FileUtils::OVERRIDE);
 	}
 
 	/**
@@ -187,7 +183,7 @@ class webservices_ModuleService extends ModuleBaseService
 	 */
 	public function getServiceTypeDefinitions($className)
 	{
-		$path = f_util_FileUtils::buildCachePath("wsdl", str_replace("_", DIRECTORY_SEPARATOR, $className) . '.types');
+		$path = f_util_FileUtils::buildChangeBuildPath("wsdl", str_replace("_", DIRECTORY_SEPARATOR, $className) . '.types');
 		if (!file_exists($path) || Framework::inDevelopmentMode())
 		{
 			$types = $this->generateServiceTypeDefinitions($className);
@@ -197,7 +193,6 @@ class webservices_ModuleService extends ModuleBaseService
 		{
 			$types = unserialize(f_util_FileUtils::read($path));
 		}
-		
 		return $types;
 	}
 	
