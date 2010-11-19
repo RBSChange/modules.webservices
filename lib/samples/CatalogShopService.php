@@ -1,8 +1,4 @@
 <?php
-/**
- * @wsdlProperties(catalog_persistentdocument_shelf:_minimal_;catalog_persistentdocument_product:id,lang,type,label;catalog_persistentdocument_shop:_minimal_;order_persistentdocument_order:id,lang,type,label,totalAmountWithTax,totalAmountWithoutTax,orderStatus)
- * @extraWsdlProperties(catalog_persistentdocument_shelf:visualURL|String;catalog_persistentdocument_product:formattedCurrentShopPrice|String,stockQuantity|Double;order_persistentdocument_order:packageTrackingNumber)
- */
 class samples_ShopWebService implements webservices_WebService
 {
 	/**
@@ -10,38 +6,31 @@ class samples_ShopWebService implements webservices_WebService
 	 */
 	public function getShops()
 	{
-		return webservices_PersistentDocument::fromDocumentArray(catalog_ShopService::getInstance()->createQuery()->find());
+		return catalog_ShopService::getInstance()->createQuery()->find();
 	}
 
 	/**
-	 * @param Integer $dayCount
+	 * @param integer $dayCount
 	 * @return order_persistentdocument_order[]
 	 */
 	public function getLastDayOrders($dayCount)
 	{
 		$date = filter_DateFilterHelper::getReferenceDate("day", $dayCount);
 		$orders = order_OrderService::getInstance()->createQuery()->add(Restrictions::gt('creationdate', $date))->find();
-		return webservices_PersistentDocument::fromDocumentArray($orders, array("totalAmountWithTax" ,"totalAmountWithoutTax", "orderStatus", "packageTrackingNumber"));
+		return $orders;
 	}
 
 	/**
-	 * @param Integer $orderId
-	 * @param String $orderStatus
-	 * @param String $trackingNumber
-	 * @return Boolean
+	 * @param integer $orderId
+	 * @param string $orderStatus
+	 * @return boolean
 	 */
-	public function setOrderStatus($orderId, $orderStatus, $trackingNumber)
+	public function setOrderStatus($orderId, $orderStatus)
 	{
 		try
 		{
 			$order = DocumentHelper::getDocumentInstance($orderId, "modules_order/order");
 			$order->setOrderStatus($orderStatus);
-			$order->setPackageTrackingNumber($trackingNumber);
-			// TODO: move this check into orderService ?
-			if ($order->getOrderStatus() == "SHIPPED" && f_util_StringUtils::isEmpty($trackingNumber))
-			{
-				throw new Exception("Tried to update orderStatus of $orderId to SHIPPED without providing $trackingNumber");
-			}
 			$order->save();
 			return true;
 		}
@@ -53,20 +42,20 @@ class samples_ShopWebService implements webservices_WebService
 	}
 
 	/**
-	 * @param Integer $shopId
-	 * @param String $lang
+	 * @param integer $shopId
+	 * @param string $lang
 	 * @return catalog_persistentdocument_shelf[]
 	 */
 	function getPrimaryShelves($lang, $shopId)
 	{
 		$this->setLang($lang);
 		$shop = $this->getShop($shopId);
-		return webservices_PersistentDocument::fromDocumentArray($shop->getPublishedTopShelfArray(), array("visualURL"));
+		return $shop->getPublishedTopShelfArray();
 	}
 
 	/**
-	 * @param String $lang
-	 * @param Integer $shelfId
+	 * @param string $lang
+	 * @param string $shelfId
 	 * @return catalog_persistentdocument_shelf[]
 	 */
 	function getSubShelves($lang, $shelfId)
@@ -74,38 +63,36 @@ class samples_ShopWebService implements webservices_WebService
 		$this->setLang($lang);
 		$shelfService = catalog_ShelfService::getInstance();
 		$shelf = DocumentHelper::getDocumentInstance($shelfId, "modules_catalog/shelf");
-
-		return webservices_PersistentDocument::fromDocumentArray($shelfService->getPublishedSubShelves($shelf), array("visualURL"));
+		return $shelfService->getPublishedSubShelves($shelf);
 	}
 
 	/**
-	 * @param String $lang
-	 * @param Integer $shelfId
+	 * @param string $lang
+	 * @param integer $shelfId
 	 * @return catalog_persistentdocument_product[]
 	 */
 	public function getProducts($lang, $shelfId)
 	{
 		$this->setLang($lang);
 		$shelf = DocumentHelper::getDocumentInstance($shelfId, "modules_catalog/shelf");
-		return webservices_PersistentDocument::fromDocumentArray(catalog_ProductService::getInstance()->createQuery()->add(Restrictions::eq("shelf", $shelf))->find(), array("formattedCurrentShopPrice", "stockQuantity"));
+		return catalog_ProductService::getInstance()->createQuery()->add(Restrictions::eq("shelf", $shelf))->find();
 	}
 
 	/**
-	 * @param String $lang
-	 * @param Integer $productId
+	 * @param string $lang
+	 * @param integer $productId
 	 * @return catalog_persistentdocument_product
 	 */
 	function getProductDetail($lang, $productId)
 	{
 		$this->setLang($lang);
-		$product = DocumentHelper::getDocumentInstance($productId, "modules_catalog/product");
-		return webservices_PersistentDocument::fromDocument($product);
+		return DocumentHelper::getDocumentInstance($productId, "modules_catalog/product");
 	}
 
 	/**
-	 * @param Integer $productId
-	 * @param Integer $newStockValue
-	 * @return Boolean
+	 * @param integer $productId
+	 * @param integer $newStockValue
+	 * @return boolean
 	 */
 	public function updateStock($productId, $newStockValue)
 	{

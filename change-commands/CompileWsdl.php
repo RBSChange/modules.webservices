@@ -19,7 +19,7 @@ class commands_CompileWsdl extends commands_AbstractChangedevCommand
 	
 	function isHidden()
 	{
-		return true;
+		return false;
 	}
 
 	/**

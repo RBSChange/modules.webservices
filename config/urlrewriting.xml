@@ -5,7 +5,10 @@
 			<template>/webservices/$moduleName/$serviceName</template>
 		</rule>
 		<rule redirection="webservices/GetSchema">
-			<template>/webservices-schemas/$schemaName</template>
+			<template>/webservices-schemas/$moduleName/$serviceName</template>
+		</rule>
+		<rule redirection="webservices/ServerJSON">
+			<template>/servicesjson/$moduleName/$serviceName</template>
 		</rule>
 	</rules>
 </urlrewriting>

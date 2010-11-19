@@ -28,10 +28,21 @@ class webservices_WebServiceProxy
 			$args[] = $paramsObj->{$parameter->getName()};
 		}
 		$res = f_util_ClassUtils::callMethodArgsOn($this->service, $name, $args);
-		/*if ($res === null)
-		{
-			return null;
-		}*/
+		if ($res !== null)
+		{	
+			if (f_util_ClassUtils::methodExists($this->service, 'getWsdlTypes'))
+			{
+				$typeList = $this->service->getWsdlTypes();
+			}
+			else
+			{
+				$typeList = webservices_ModuleService::getInstance()->getServiceTypeDefinitions(self::$serviceClassName);
+			}
+			$responseType = $typeList->getType($name."Response");
+			$resultTypeName = $responseType->getXsdElement($name."Result")->getType();
+			$resultType = $typeList->getType($resultTypeName);
+			return array($name."Result" => $resultType->formatValue($res));
+		}
 		return array($name."Result" => $res);
 	}
 }

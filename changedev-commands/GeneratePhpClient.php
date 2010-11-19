@@ -55,9 +55,86 @@ class commands_GeneratePhpClient extends commands_AbstractChangedevCommand
 		{
 			return $this->quitError("$className does not implement webservices_WebService interface");
 		}
+		
+
 
 		ob_start();
 		echo "<?php\n";
+echo '
+class wscli_array implements Iterator, ArrayAccess
+{
+    private $position = 0;  
+    public $items = array();  
+    
+    
+    public function rewind() {$this->position = 0;}
+    public function current() {return $this->items[$this->position];}
+    public function key() {return $this->position;}
+    public function next() {++$this->position;}
+    public function valid() {return isset($this->items[$this->position]);}
+    
+ 	public function offsetSet($offset, $value) 
+ 	{
+        if (is_null($offset))
+        {
+            $this->items[] = $value;
+        } 
+        else 
+        {
+            $this->items[$offset] = $value;
+        }
+    }
+    public function offsetExists($offset) {return isset($this->items[$offset]);}
+    public function offsetUnset($offset) {unset($this->items[$offset]);}
+    public function offsetGet($offset) {return isset($this->items[$offset]) ? $this->items[$offset] : null;}
+}
+';
+		
+		$classmap = array();
+		$wsdlTypes = webservices_ModuleService::getInstance()->getServiceTypeDefinitions($className);
+		foreach ($wsdlTypes->getTypes() as $xsdComplex) 
+		{
+			//$xsdComplex = new webservices_XsdComplex();
+			if ($xsdComplex->isArray()) 
+			{
+				$classmap[$xsdComplex->getType()] = 'wscli_array';
+			}
+			else
+			{
+				$classmap[$xsdComplex->getType()] = 'cl_' . $xsdComplex->getType();
+			}
+		}
+		
+		foreach ($classmap as $wsdlTypeName => $cn) 
+		{
+			if ($cn === 'wscli_array') {continue;}
+			
+			$xsdComplex = $wsdlTypes->getType($wsdlTypeName);
+			echo "class $cn {\n";
+			foreach ($xsdComplex->getXsdElementArray() as $propName => $xsdPropType) 
+			{
+				if ($xsdPropType->isArray())
+				{
+					$propType = $xsdPropType->getItem()->getType();
+					if (isset($classmap[$propType])) {$propType = $classmap[$propType];}
+					if ($propType === 'int') {$propType = 'integer';}
+					$propType .= '[]';
+				}
+				else
+				{
+					$propType = $xsdPropType->getType();
+					if (isset($classmap[$propType])) {$propType = $classmap[$propType];}
+					if ($propType === 'int') {$propType = 'integer';}
+				}
+				echo "	/**\n";
+				echo "	 * @var $propType\n";
+				echo "	 */\n";
+				echo "	 public \$$propName;\n\n";
+			}
+			echo "}\n";
+		}
+		
+	
 		// TODO: generate classes for object method returns and set classmap option for soap client
 		foreach ($class->getMethods(ReflectionMethod::IS_PUBLIC) as $method)
 		{
@@ -82,7 +159,7 @@ class commands_GeneratePhpClient extends commands_AbstractChangedevCommand
 			}
 			echo "}\n";
 		}
-
+		
 		echo "class ".$class->getName()."Client {
 	private \$client;
 	private \$endPoint;
@@ -94,6 +171,7 @@ class commands_GeneratePhpClient extends commands_AbstractChangedevCommand
 	function __construct(\$endPoint) {
 		\$this->endPoint = \$endPoint;
 		\$this->clientOptions = array('encoding' => 'utf-8', 'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP, 'trace' => true, 'features' => SOAP_SINGLE_ELEMENT_ARRAYS);
+		\$this->clientOptions['classmap'] = " . var_export($classmap, true) .";
 	}
 	
 	/**
@@ -146,15 +224,10 @@ class commands_GeneratePhpClient extends commands_AbstractChangedevCommand
 			{
 				$params[$param->getName()] = '$'.$param->getName();
 			}
-			echo "	".$method->getDocComment()."\n";
+			$comment = str_replace(array_keys($classmap) , array_values($classmap), $method->getDocComment());
+			echo "	".$comment."\n";
 			echo "	function ".$method->getName()."(".join(", ", $params).") {\n";
-			echo "		\$res = \$this->getClient()->".$method->getName()."(new ".strtolower($className)."_".ucfirst($method->getName())."Param(".join(", ", $params)."))->".$method->getName()."Result;\n";
-			$returnType = f_util_ClassUtils::getReturnType($method);
-			if (f_util_StringUtils::endsWith($returnType, "[]"))
-			{
-				echo "		\$res = \$this->getArray(\$res);\n";
-			}
-			echo "		return \$res;\n";
+			echo "		return \$this->getClient()->".$method->getName()."(new ".strtolower($className)."_".ucfirst($method->getName())."Param(".join(", ", $params)."))->".$method->getName()."Result;\n";
 			echo "	}\n\n";
 		}
 		echo "}\n";
