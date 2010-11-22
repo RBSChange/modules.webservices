@@ -172,6 +172,19 @@ class webservices_XsdElement
 		}
 		return $data;
 	}
+	
+	public function formatPhpValue($data)
+	{
+		if ($this->type === 'dateTime' && !empty($data))
+		{
+			return str_replace(array('T', 'Z'), array(' ', ''), $data);
+		}
+		else if ($this->type === 'boolean')
+		{
+			return ($data == true);
+		}
+		return $data;		
+	}
 }
 
 class webservices_XsdComplex extends webservices_XsdElement
@@ -234,7 +247,7 @@ class webservices_XsdComplex extends webservices_XsdElement
 	 */
 	public static function DOCUMENT()
 	{
-		$result = new self('webservices_Document', false, 'tns');
+		$result = new self('webservices_Document', true, 'tns');
 		$result->xsdElementArray['id'] = webservices_XsdElement::INTEGER(true);
 		$result->phpClass = "f_persistentdocument_PersistentDocumentImpl";
 		return $result;
@@ -293,7 +306,12 @@ class webservices_XsdComplex extends webservices_XsdElement
 				}
 				else
 				{
-					$this->addXsdElement($propName, self::DOCUMENT());
+					$el = self::DOCUMENT();
+					if ($propertyInfo->isRequired())
+					{
+						$el->setNillable(false);
+					}
+					$this->addXsdElement($propName, $el);
 				}
 			}
 			else
@@ -347,18 +365,89 @@ class webservices_XsdComplex extends webservices_XsdElement
 	 */
 	public function formatValue($data)
 	{
-		if (is_object($data))
+		if ($data !== null && is_object($data))
 		{
 			$result = new stdClass();
 			foreach ($this->getXsdElementArray() as $propName => $element) 
 			{
 				$getter = 'get' . ucfirst($propName) . ($element->isArray() ? 'Array' : '');
-				$value = $data->{$getter}();
+				if (is_callable(array($data, $getter), false))
+				{
+					$value = $data->{$getter}();
+				}
+				else
+				{
+					$value = $data->{$propName};
+				}
 				$result->$propName = $element->formatValue($value);
 			}
 			return $result;
 		}
 		return null;
+	}
+	
+	public function formatPhpValue($data, $outObject = null)
+	{
+		if ($data === null) {return null;}
+		if ($this->phpClass === "f_persistentdocument_PersistentDocumentImpl")
+		{
+			$id = intval($data->id);
+			if ($id > 0)
+			{
+				return DocumentHelper::getDocumentInstance($id);
+			}
+			return $outObject;
+		}
+		
+		$isPersitentDoc = false;
+		if ($this->phpClass !== null)
+		{
+			$reflectionClass = new ReflectionClass($this->phpClass);
+			if ($reflectionClass->implementsInterface('f_persistentdocument_PersistentDocument'))
+			{
+				$isPersitentDoc = true;
+				$id = intval($data->id);
+				if ($id > 0 &&$outObject === null)
+				{
+					$outObject = DocumentHelper::getDocumentInstance($id);
+				}
+				if ($outObject === null || get_class($outObject) !== $this->phpClass)
+				{
+					return null;
+				}
+			}
+		}
+		if ($outObject === null)
+		{
+			$outObject = new $this->phpClass;
+		}
+		
+		if (!$isPersitentDoc)
+		{
+			foreach ($this->getXsdElementArray() as $propName => $element)
+			{
+				$value = $data->{$propName};
+				$outObject->{$propName} = $element->formatPhpValue($value);
+			}
+			return $outObject;	
+		}
+		
+		foreach ($this->getXsdElementArray() as $propName => $element)
+		{
+			if ($propName === 'id') {continue;}
+			$rawValue = $data->{$propName};
+			$propValue = $element->formatPhpValue($rawValue);
+			$setter = 'set' . ucfirst($propName) . ($element->isArray() ? 'Array' : '');
+			if (is_callable(array($outObject, $setter), false))
+			{
+				$outObject->{$setter}($propValue);
+			}
+			else
+			{
+				$outObject->{$propName} = $propValue;
+			}
+		}
+		return $outObject;	
 	}
 }
 
@@ -508,5 +597,18 @@ class webservices_XsdComplexArray extends webservices_XsdComplex
 		}
 		return $result;
 	}
+	
+	public function formatPhpValue($data)
+	{
+		$result = array();
+		if ($data !== null && is_array($data->items))
+		{
+			$element = $this->getItem();
+			foreach ($data->items as $item) 
+			{
+				$result[] = $element->formatPhpValue($item);
+			}
+		}
+		return $result;	
+	}
 }
-
