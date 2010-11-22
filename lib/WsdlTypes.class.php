@@ -160,6 +160,7 @@ class webservices_WsdlTypes
 	{
 		switch (strtolower($phpScalar))
 		{
+			case 'int':
 			case 'integer':
 				return webservices_XsdElement::INTEGER();
 			case 'boolean':

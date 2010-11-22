@@ -40,6 +40,10 @@ class webservices_ServiceJSONProxy
 			$responseType = $typeList->getType($method."Response");
 			$resultTypeName = $responseType->getXsdElement($method."Result")->getType();
 			$resultType = $typeList->getType($resultTypeName);
+			if ($resultType === null)
+			{
+				$resultType = webservices_WsdlTypes::getSimpleType($resultTypeName);
+			}
 			$res = $resultType->formatValue($res);
 		}
 		echo JsonService::getInstance()->encode(array('result' => $res));

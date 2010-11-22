@@ -391,7 +391,7 @@ class webservices_XsdComplex extends webservices_XsdElement
 		if ($data === null) {return null;}
 		if ($this->phpClass === "f_persistentdocument_PersistentDocumentImpl")
 		{
-			$id = intval($data->id);
+			$id = (is_array($data)) ? intval($data['id']) : intval($data->id);
 			if ($id > 0)
 			{
 				return DocumentHelper::getDocumentInstance($id);
@@ -406,12 +406,12 @@ class webservices_XsdComplex extends webservices_XsdElement
 			if ($reflectionClass->implementsInterface('f_persistentdocument_PersistentDocument'))
 			{
 				$isPersitentDoc = true;
-				$id = intval($data->id);
-				if ($id > 0 &&$outObject === null)
+				$id = (is_array($data)) ? intval($data['id']) : intval($data->id);
+				if ($id > 0 && $outObject === null)
 				{
 					$outObject = DocumentHelper::getDocumentInstance($id);
 				}
-				if ($outObject === null || get_class($outObject) !== $this->phpClass)
+				if ($outObject === null || !($outObject instanceof $this->phpClass))
 				{
 					return null;
 				}
@@ -426,7 +426,16 @@ class webservices_XsdComplex extends webservices_XsdElement
 		{
 			foreach ($this->getXsdElementArray() as $propName => $element)
 			{
-				$value = $data->{$propName};
+				if (is_array($data))
+				{
+					if (!isset($data[$propName])) {continue;}
+					$value = $data[$propName];
+				}
+				else
+				{
+					if (!isset($data->{$propName})) {continue;}
+					$value = $data->{$propName};
+				}
 				$outObject->{$propName} = $element->formatPhpValue($value);
 			}
 			return $outObject;	
@@ -435,7 +444,17 @@ class webservices_XsdComplex extends webservices_XsdElement
 		foreach ($this->getXsdElementArray() as $propName => $element)
 		{
 			if ($propName === 'id') {continue;}
-			$rawValue = $data->{$propName};
+			if (is_array($data))
+			{
+				if (!isset($data[$propName])) {continue;}
+				$rawValue = $data[$propName];
+			}
+			else
+			{
+				if (!isset($data->{$propName})) {continue;}
+				$rawValue = $data->{$propName};
+			}
+			
 			$propValue = $element->formatPhpValue($rawValue);
 			$setter = 'set' . ucfirst($propName) . ($element->isArray() ? 'Array' : '');
 			if (is_callable(array($outObject, $setter), false))

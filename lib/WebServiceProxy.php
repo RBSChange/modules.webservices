@@ -41,6 +41,10 @@ class webservices_WebServiceProxy
 			$responseType = $typeList->getType($name."Response");
 			$resultTypeName = $responseType->getXsdElement($name."Result")->getType();
 			$resultType = $typeList->getType($resultTypeName);
+			if ($resultType === null)
+			{
+				$resultType = webservices_WsdlTypes::getSimpleType($resultTypeName);
+			}
 			return array($name."Result" => $resultType->formatValue($res));
 		}
 		return array($name."Result" => $res);
