@@ -18,6 +18,20 @@ class webservices_ServerJSONAction extends f_action_BaseJSONAction
 			$serviceName = $request->getModuleParameter('webservices', 'serviceName');
 			$className = $moduleName . "_" . ucfirst($serviceName) . "WebService";
 			
+			if ($request->hasParameter("info") || $request->hasParameter("INFO"))
+			{
+				$template = TemplateLoader::getInstance()->setMimeContentType(K::HTML)
+					->setPackageName('modules_webservices')
+					->setDirectory('templates')->load('jsondef');
+				$service = new webservices_ServiceJSONProxy($className);
+				$template->setAttribute('jsonurl', Framework::getUIBaseUrl() . "/servicesjson/$moduleName/$serviceName");
+				$template->setAttribute('moduleName', $moduleName);
+				$template->setAttribute('serviceName', $serviceName);
+				$template->setAttribute('jsonService', $service);
+				echo $template->execute();
+				return null;
+			}
+		
 			$secureId = webservices_WsService::getInstance()->getSecureExcuteByClass($className);
 			Framework::info(__METHOD__ . $secureId);
 			

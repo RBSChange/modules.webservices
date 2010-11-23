@@ -1,0 +1,17 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Détail du service</title>
+</head>
+<body>
+	<h1>Méthod du service : ${moduleName} / ${serviceName}</h1>
+	<tal:block tal:repeat="method jsonService/getMethods">
+	<h3>${repeat/method/key}</h3>
+	<form action="${jsonurl}" target="_blanck">
+		<textarea rows="8" cols="100" name="REQUEST" spellcheck="false">${method}</textarea>
+		<button type="submit">Envoyer</button>
+	</form>
+	<hr />
+	</tal:block>
+</body>
+</html>

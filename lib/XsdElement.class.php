@@ -53,6 +53,14 @@ class webservices_XsdElement
 	}
 	
 	/**
+	 * @return boolean
+	 */
+	public function isNillable()
+	{
+		return $this->nillable;
+	}
+	
+	/**
 	 * @return string in | out | NULL
 	 */
 	public function getDirection()
