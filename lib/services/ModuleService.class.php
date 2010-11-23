@@ -111,16 +111,17 @@ class webservices_ModuleService extends ModuleBaseService
 		
 		foreach ($class->getMethods(ReflectionMethod::IS_PUBLIC) as $method)
 		{
-			if ($method->getName() === 'getWsdlTypesService')
+			$methodName = $method->getName();
+			if ($methodName === 'getWsdlTypesService' || $methodName === 'getWsdlTypes')
 			{
 				continue;
 			}
 			
 			// Binding
 			$operationElem = $wsdl->createElement('wsdl:operation');
-			$operationElem->setAttribute("name", $method->getName());
+			$operationElem->setAttribute("name", $methodName);
 			$soapOperation =  $wsdl->createElement('soap:operation');
-			$soapOperation->setAttribute("soapAction", $targetNameSpace."/".$method->getName());
+			$soapOperation->setAttribute("soapAction", $targetNameSpace."/".$methodName);
 			$soapOperation->setAttribute("style", "document");
 			$operationElem->appendChild($soapOperation);
 
@@ -140,37 +141,36 @@ class webservices_ModuleService extends ModuleBaseService
 
 			// PortType
 			$operationElem = $wsdl->createElement('wsdl:operation');
-			$operationElem->setAttribute("name", $method->getName());
+			$operationElem->setAttribute("name", $methodName);
 
 			$input = $wsdl->createElement('wsdl:input');
-			$input->setAttribute("message", "tns:".$method->getName()."Request");
+			$input->setAttribute("message", "tns:".$methodName."Request");
 			$operationElem->appendChild($input);
 
 			$output = $wsdl->createElement('wsdl:output');
-			$output->setAttribute("message", "tns:".$method->getName()."Response");
+			$output->setAttribute("message", "tns:".$methodName."Response");
 			$operationElem->appendChild($output);
 
 			$portTypeElem->appendChild($operationElem);
 
 			// Request message
 			$requestMessageElem = $wsdl->createElement('wsdl:message');
-			$requestMessageElem->setAttribute("name", $method->getName()."Request");
+			$requestMessageElem->setAttribute("name", $methodName."Request");
 			$requestMessagePartElem = $wsdl->createElement('wsdl:part');
 			$requestMessagePartElem->setAttribute("name", "parameters");
-			$requestMessagePartElem->setAttribute("element", "tns:".$method->getName()."Params");
+			$requestMessagePartElem->setAttribute("element", "tns:".$methodName."Params");
 			$requestMessageElem->appendChild($requestMessagePartElem);
 			$wsdl->documentElement->appendChild($requestMessageElem);
 								
 			// Response message
 			$responseMessageElem = $wsdl->createElement('wsdl:message');
-			$responseMessageElem->setAttribute("name", $method->getName()."Response");
+			$responseMessageElem->setAttribute("name", $methodName."Response");
 			$responseMessagePartElem = $wsdl->createElement('wsdl:part');
 			$responseMessagePartElem->setAttribute("name", "parameters");
-			$responseMessagePartElem->setAttribute("element", "tns:".$method->getName()."Response");
+			$responseMessagePartElem->setAttribute("element", "tns:".$methodName."Response");
 			$responseMessageElem->appendChild($responseMessagePartElem);
 			$wsdl->documentElement->appendChild($responseMessageElem);
 		}
-		
 		$typeList = $this->getServiceTypeDefinitions($className);
 		$typeList->addInSchema($wsdl);
 		return $wsdl->saveXML();
@@ -212,23 +212,27 @@ class webservices_ModuleService extends ModuleBaseService
 		$typeList = new webservices_WsdlTypes($className);	
 		foreach ($class->getMethods(ReflectionMethod::IS_PUBLIC) as $method)
 		{
-			if ($method->getName() === 'getWsdlTypesService')
+			$methodName = $method->getName();
+			if ($methodName === 'getWsdlTypesService' || $methodName === 'getWsdlTypes')
 			{
 				continue;
 			}
-			
-			$type = webservices_XsdComplexFunction::FUNCTIONINFO($method->getName()."Params", 'in');
+			$type = webservices_XsdComplexFunction::FUNCTIONINFO($methodName."Params", 'in');
 			foreach ($method->getParameters() as $parameter)
 			{
 				$paramName = $parameter->getName();			
 				$phpType = f_util_ClassUtils::getParamType($method, $paramName);
+				if (empty($phpType))
+				{
+					throw new Exception("Invalid parameter type in $className::" . $methodName . " param -> $paramName");
+				}
 				$para = $typeList->createXsdElement($phpType);
 				$para->setMinOccurs(1);	
 				$type->addXsdElement($paramName, $para);
 			}
 			$typeList->addComplexType($type);
 
-			$type = webservices_XsdComplexFunction::FUNCTIONINFO($method->getName()."Response", 'out');
+			$type = webservices_XsdComplexFunction::FUNCTIONINFO($methodName."Response", 'out');
 			$phpType = f_util_ClassUtils::getReturnType($method);
 			$para = $typeList->createXsdElement($phpType);
 			if ($para === null)
@@ -236,7 +240,7 @@ class webservices_ModuleService extends ModuleBaseService
 				$para = webservices_XsdElement::STRING();
 				$para->setMinOccurs(1);
 			}
-			$type->addXsdElement($method->getName()."Result", $para);
+			$type->addXsdElement($methodName."Result", $para);
 			$typeList->addComplexType($type);
 		}
 		return $typeList;
