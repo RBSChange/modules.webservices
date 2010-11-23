@@ -258,13 +258,15 @@ class webservices_WsdlTypesService extends BaseService
 	
 	/**
 	 * @param f_persistentdocument_PersistentDocumentModel $model
+	 * @param array $exludedProperties
 	 * @return string[]
 	 */
-	protected function getLocalizedtModelPopertyNames($model)
+	protected function getLocalizedtModelPopertyNames($model, $exludedProperties = array())
 	{
 		$result = array('id');
 		foreach ($model->getEditablePropertiesInfos() as $propertyInfo) 
 		{
+		if (in_array($propertyInfo->getName(), $exludedProperties)) {continue;}
 			if ($propertyInfo->isLocalized())
 			{
 				$result[] = $propertyInfo->getName();
@@ -275,13 +277,15 @@ class webservices_WsdlTypesService extends BaseService
 
 	/**
 	 * @param f_persistentdocument_PersistentDocumentModel $model
+	 * @param array $exludedProperties
 	 * @return string[]
 	 */
-	protected function getScalarPopertyNames($model)
+	protected function getScalarPopertyNames($model, $exludedProperties = array())
 	{
 		$result = array();
 		foreach ($model->getEditablePropertiesInfos() as $propertyInfo) 
 		{
+			if (in_array($propertyInfo->getName(), $exludedProperties)) {continue;}
 			if (!$propertyInfo->isDocument())
 			{
 				$result[] = $propertyInfo->getName();
