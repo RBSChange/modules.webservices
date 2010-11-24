@@ -394,12 +394,38 @@ class webservices_XsdComplex extends webservices_XsdElement
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @param mixed $data
+	 * @param string $name
+	 * @return array<$value, $defined>
+	 */
+	private function getRawPhpPropertyValue($data, $name)
+	{
+		if (is_array($data))
+		{
+			if (isset($data[$name]))
+			{
+				return array($data[$name], true);
+			}
+		}
+		else if (is_object($data))
+		{
+			if (isset($data->{$name})) 
+			{
+				return array($data->{$name}, true);
+			}
+		}
+		return array(null, false);
+	}
+	
 	public function formatPhpValue($data, $outObject = null)
 	{
 		if ($data === null) {return null;}
 		if ($this->phpClass === "f_persistentdocument_PersistentDocumentImpl")
 		{
-			$id = (is_array($data)) ? intval($data['id']) : intval($data->id);
+			list($id, $defined) = $this->getRawPhpPropertyValue($data, 'id');
+			$id = $defined ? intval($id) : 0;
 			if ($id > 0)
 			{
 				return DocumentHelper::getDocumentInstance($id);
@@ -414,7 +440,9 @@ class webservices_XsdComplex extends webservices_XsdElement
 			if ($reflectionClass->implementsInterface('f_persistentdocument_PersistentDocument'))
 			{
 				$isPersitentDoc = true;
-				$id = (is_array($data)) ? intval($data['id']) : intval($data->id);
+				list($id, $defined) = $this->getRawPhpPropertyValue($data, 'id');
+				$id = $defined ? intval($id) : 0;
+				
 				if ($id > 0 && $outObject === null)
 				{
 					$outObject = DocumentHelper::getDocumentInstance($id);
@@ -434,17 +462,11 @@ class webservices_XsdComplex extends webservices_XsdElement
 		{
 			foreach ($this->getXsdElementArray() as $propName => $element)
 			{
-				if (is_array($data))
+				list($value, $defined) = $this->getRawPhpPropertyValue($data, $propName);
+				if ($defined)
 				{
-					if (!isset($data[$propName])) {continue;}
-					$value = $data[$propName];
+					$outObject->{$propName} = $element->formatPhpValue($value);
 				}
-				else
-				{
-					if (!isset($data->{$propName})) {continue;}
-					$value = $data->{$propName};
-				}
-				$outObject->{$propName} = $element->formatPhpValue($value);
 			}
 			return $outObject;	
 		}
@@ -452,17 +474,9 @@ class webservices_XsdComplex extends webservices_XsdElement
 		foreach ($this->getXsdElementArray() as $propName => $element)
 		{
 			if ($propName === 'id') {continue;}
-			if (is_array($data))
-			{
-				if (!isset($data[$propName])) {continue;}
-				$rawValue = $data[$propName];
-			}
-			else
-			{
-				if (!isset($data->{$propName})) {continue;}
-				$rawValue = $data->{$propName};
-			}
-			
+			list($rawValue, $defined) = $this->getRawPhpPropertyValue($data, $propName);
+			if (!$defined) {continue;}
+						
 			$propValue = $element->formatPhpValue($rawValue);
 			$setter = 'set' . ucfirst($propName) . ($element->isArray() ? 'Array' : '');
 			if (is_callable(array($outObject, $setter), false))
