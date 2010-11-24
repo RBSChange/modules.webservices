@@ -61,7 +61,7 @@ class commands_GeneratePhpClient extends commands_AbstractChangedevCommand
 		ob_start();
 		echo "<?php\n";
 echo '
-class wscli_array implements Iterator, ArrayAccess
+class cl_array implements Iterator, ArrayAccess
 {
     private $position = 0;  
     public $items = array();  
@@ -97,7 +97,7 @@ class wscli_array implements Iterator, ArrayAccess
 			//$xsdComplex = new webservices_XsdComplex();
 			if ($xsdComplex->isArray()) 
 			{
-				$classmap[$xsdComplex->getType()] = 'wscli_array';
+				$classmap[$xsdComplex->getType()] = 'cl_array';
 			}
 			else
 			{
@@ -107,7 +107,7 @@ class wscli_array implements Iterator, ArrayAccess
 		
 		foreach ($classmap as $wsdlTypeName => $cn) 
 		{
-			if ($cn === 'wscli_array') {continue;}
+			if ($cn === 'cl_array') {continue;}
 			
 			$xsdComplex = $wsdlTypes->getType($wsdlTypeName);
 			echo "class $cn {\n";
