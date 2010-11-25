@@ -32,9 +32,7 @@ class webservices_ServerJSONAction extends f_action_BaseJSONAction
 				return null;
 			}
 		
-			$secureId = webservices_WsService::getInstance()->getSecureExcuteByClass($className);
-			Framework::info(__METHOD__ . $secureId);
-			
+			$secureId = webservices_WsService::getInstance()->getSecureExcuteByClass($className);			
 			if ($secureId > 0)
 			{
 				// Basic authentication

@@ -383,6 +383,10 @@ class webservices_XsdComplex extends webservices_XsdElement
 				{
 					$value = $data->{$getter}();
 				}
+				else if ($propName === 'model' && $data instanceof f_persistentdocument_PersistentDocumentImpl)
+				{
+					$value = $data->getDocumentModelName();
+				}
 				else
 				{
 					$value = $data->{$propName};
