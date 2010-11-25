@@ -93,7 +93,11 @@ class webservices_ServiceJSONProxy
 	
 	private function getDefaultValue($propType, $name = null)
 	{
-		if ($propType instanceof webservices_XsdComplex) 
+		if ($propType instanceof webservices_XsdComplexArray)
+		{
+			return array($this->getDefaultValue($propType->getItem()));
+		}
+		else if ($propType instanceof webservices_XsdComplex) 
 		{
 			$result = array();
 			foreach ($propType->getXsdElementArray() as $objectName => $subType)
