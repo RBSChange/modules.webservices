@@ -97,13 +97,9 @@ class samples_ShopWebService implements webservices_WebService
 	public function updateStock($productId, $newStockValue)
 	{
 		$product = DocumentHelper::getDocumentInstance($productId, "modules_catalog/product");
-		if ($product instanceof catalog_StockableDocument)
-		{
-			$product->setStockQuantity($newStockValue);
-			$product->save();
-			return true;
-		}
-		return false;
+		$product->setStockQuantity($newStockValue);
+		$product->save();
+		return true;
 	}
 
 	// private content
