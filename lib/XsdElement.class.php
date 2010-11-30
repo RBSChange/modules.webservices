@@ -646,10 +646,19 @@ class webservices_XsdComplexArray extends webservices_XsdComplex
 	public function formatPhpValue($data)
 	{
 		$result = array();
-		if ($data !== null && is_array($data->items))
+		if ($data !== null)
 		{
+			$elements = array();
+			if (is_array($data))
+			{
+				$elements = $data;
+			}
+			elseif (is_array($data->items))
+			{
+				$elements = $data->items;
+			}
 			$element = $this->getItem();
-			foreach ($data->items as $item) 
+			foreach ($elements as $item) 
 			{
 				$result[] = $element->formatPhpValue($item);
 			}
