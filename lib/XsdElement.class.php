@@ -765,9 +765,13 @@ class webservices_XsdComplexArray extends webservices_XsdComplex
 			{
 				$elements = $data;
 			}
-			elseif (is_array($data->items))
+			elseif (isset($data->items)&& is_array($data->items))
 			{
 				$elements = $data->items;
+			}
+			elseif (isset($data->items))
+			{
+				$elements = array($data->items);
 			}
 			$element = $this->getItem();
 			foreach ($elements as $item) 

@@ -8,4 +8,5 @@
   <actiondef modulename="webservices" actionname="insert.ws" label="m.webservices.bo.useractionlogger.insert-ws"/>
   <actiondef modulename="webservices" actionname="update.ws" label="m.webservices.bo.useractionlogger.update-ws"/>
   <actiondef modulename="webservices" actionname="savepermissions.rootfolder" label="m.webservices.bo.useractionlogger.savepermissions-rootfolder"/>
+  <actiondef modulename="webservices" actionname="move.ws" label="modules.webservices.bo.useractionlogger.move-ws"/>
 </script>
