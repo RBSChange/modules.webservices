@@ -61,32 +61,36 @@ class commands_GeneratePhpClient extends commands_AbstractChangedevCommand
 		ob_start();
 		echo "<?php\n";
 echo '
-class cl_array implements Iterator, ArrayAccess
+if (!class_exists("cl_array", false))
 {
-    private $position = 0;  
-    public $items = array();  
-    
-    
-    public function rewind() {$this->position = 0;}
-    public function current() {return $this->items[$this->position];}
-    public function key() {return $this->position;}
-    public function next() {++$this->position;}
-    public function valid() {return isset($this->items[$this->position]);}
-    
- 	public function offsetSet($offset, $value) 
- 	{
-        if (is_null($offset))
-        {
-            $this->items[] = $value;
-        } 
-        else 
-        {
-            $this->items[$offset] = $value;
-        }
-    }
-    public function offsetExists($offset) {return isset($this->items[$offset]);}
-    public function offsetUnset($offset) {unset($this->items[$offset]);}
-    public function offsetGet($offset) {return isset($this->items[$offset]) ? $this->items[$offset] : null;}
+	class cl_array implements Iterator, ArrayAccess, Countable
+	{
+	    private $position = 0;  
+	    public $items = array();  
+	    
+	    
+	    public function rewind() {$this->position = 0;}
+	    public function current() {return $this->items[$this->position];}
+	    public function key() {return $this->position;}
+	    public function next() {++$this->position;}
+	    public function valid() {return isset($this->items[$this->position]);}
+	    
+	 	public function offsetSet($offset, $value) 
+	 	{
+	        if (is_null($offset))
+	        {
+	            $this->items[] = $value;
+	        } 
+	        else 
+	        {
+	            $this->items[$offset] = $value;
+	        }
+	    }
+	    public function offsetExists($offset) {return isset($this->items[$offset]);}
+	    public function offsetUnset($offset) {unset($this->items[$offset]);}
+	    public function offsetGet($offset) {return isset($this->items[$offset]) ? $this->items[$offset] : null;}
+	    public function count() { return count($this->items); }
+	}
 }
 ';
 		
@@ -110,7 +114,7 @@ class cl_array implements Iterator, ArrayAccess
 			if ($cn === 'cl_array') {continue;}
 			
 			$xsdComplex = $wsdlTypes->getType($wsdlTypeName);
-			echo "class $cn {\n";
+			echo "if (!class_exists('$cn', false)) { class $cn {\n";
 			foreach ($xsdComplex->getXsdElementArray() as $propName => $xsdPropType) 
 			{
 				if ($xsdPropType->isArray())
@@ -131,11 +135,9 @@ class cl_array implements Iterator, ArrayAccess
 				echo "	 */\n";
 				echo "	 public \$$propName;\n\n";
 			}
-			echo "}\n";
+			echo "}}\n";
 		}
-		
-	
-		// TODO: generate classes for object method returns and set classmap option for soap client
+
 		foreach ($class->getMethods(ReflectionMethod::IS_PUBLIC) as $method)
 		{
 			echo "class ".strtolower($className)."_".ucfirst($method->getName())."Param {\n";
@@ -197,7 +199,28 @@ class cl_array implements Iterator, ArrayAccess
 		\$this->clientOptions[\$name] = \$value;
 	}
 	
-	private function getClient() {
+	/**
+	 * @param \$otherChangeWebServiceClient
+	 */
+	function importChangeSession(\$otherChangeWebServiceClient) {
+		\$this->getSoapClient()->_cookies = \$otherChangeWebServiceClient->getSoapClient()->_cookies;
+		return;
+		/* FIXME: this code is not working .. ?
+		\$otherCookies = \$otherChangeWebServiceClient->getSoapClient()->_cookies;
+		if (isset(\$otherCookies['__CHANGESESSIONID'])) {
+			\$client = \$this->getSoapClient();
+			if (\$client->_cookies === null) {
+				\$client->_cookies = array();
+			}
+			\$client->_cookies['__CHANGESESSIONID'] = \$otherCookies['__CHANGESESSIONID'];
+		}
+		*/
+	}
+	
+	/**
+	 * @return SoapClient
+	 */
+	public function getSoapClient() {
 		if (\$this->client === null) {
 			\$this->client = new SoapClient(\$this->endPoint.'?wsdl', \$this->clientOptions);
 		}
@@ -227,7 +250,7 @@ class cl_array implements Iterator, ArrayAccess
 			$comment = str_replace(array_keys($classmap) , array_values($classmap), $method->getDocComment());
 			echo "	".$comment."\n";
 			echo "	function ".$method->getName()."(".join(", ", $params).") {\n";
-			echo "		return \$this->getClient()->".$method->getName()."(new ".strtolower($className)."_".ucfirst($method->getName())."Param(".join(", ", $params)."))->".$method->getName()."Result;\n";
+			echo "		return \$this->getSoapClient()->".$method->getName()."(new ".strtolower($className)."_".ucfirst($method->getName())."Param(".join(", ", $params)."))->".$method->getName()."Result;\n";
 			echo "	}\n\n";
 		}
 		echo "}\n";
