@@ -26,13 +26,17 @@ class webservices_WsdlTypes
 		}
 		return $this->typeService;
 	}
-		
+	
 	/**
 	 * @param string $phpType
 	 * @return webservices_XsdElement
 	 */
 	public function createXsdElement($phpType)
 	{
+		if ($phpType === null)
+		{
+			return null;
+		}
 		list($phpClass, $isArray) = self::parsePhpType($phpType);
 		$xsdElement = self::getSimpleType($phpClass);
 		if ($xsdElement !== null)
@@ -66,7 +70,7 @@ class webservices_WsdlTypes
 	 */
 	public function addComplexType($complexType)
 	{
-		if ($complexType instanceof webservices_XsdComplex) 
+		if ($complexType instanceof webservices_XsdComplex)
 		{
 			$this->addType($complexType);
 		}
@@ -78,7 +82,7 @@ class webservices_WsdlTypes
 	public function addInSchema($wsdl)
 	{
 		$schemaElem = $wsdl->findUnique("wsdl:types/xsd:schema");
-		foreach ($this->typeArray as $typeName => $complexType) 
+		foreach ($this->typeArray as $typeName => $complexType)
 		{
 			$complexType->addInSchema($wsdl, $schemaElem);
 		}
@@ -121,7 +125,6 @@ class webservices_WsdlTypes
 		}
 	}
 	
-	
 	/**
 	 * @param webservices_XsdComplex $xsdComplex
 	 */
@@ -129,9 +132,9 @@ class webservices_WsdlTypes
 	{
 		$typeName = $xsdComplex->getType();
 		$this->typeArray[$typeName] = $xsdComplex;
-		foreach ($xsdComplex->getXsdElementArray() as $element) 
+		foreach ($xsdComplex->getXsdElementArray() as $element)
 		{
-			if ($element instanceof webservices_XsdComplex) 
+			if ($element instanceof webservices_XsdComplex)
 			{
 				$this->addType($element);
 			}
@@ -144,7 +147,7 @@ class webservices_WsdlTypes
 	 * @return list(string phpClass, boolean isArray)
 	 */
 	public static function parsePhpType($phpType)
-	{	
+	{
 		if (substr($phpType, -2) == '[]')
 		{
 			return array(substr($phpType, 0, strlen($phpType) - 2), true);
@@ -160,35 +163,37 @@ class webservices_WsdlTypes
 	{
 		switch (strtolower($phpScalar))
 		{
-			case 'int':
-			case 'integer':
+			case 'int' :
+			case 'integer' :
 				return webservices_XsdElement::INTEGER();
-			case 'boolean':
+			case 'boolean' :
 				return webservices_XsdElement::BOOLEAN();
-			case 'float':
-			case 'double':
+			case 'float' :
+			case 'double' :
 				return webservices_XsdElement::DOUBLE();
-			case 'date':
-			case 'datetime':
+			case 'date' :
+			case 'datetime' :
 				return webservices_XsdElement::DATETIME();
-			case 'string':
+			case 'string' :
 				return webservices_XsdElement::STRING();
 		}
 		return null;
 	}
 	
 	/**
-	 * 
 	 * @param string $phpClass
 	 * @return webservices_XsdComplex
 	 */
 	public static function getComplexType($phpClass)
 	{
-		if (!f_util_ClassUtils::classExists($phpClass)) {return null;}
+		if (!f_util_ClassUtils::classExists($phpClass))
+		{
+			return null;
+		}
 		$reflectionClass = new ReflectionClass($phpClass);
 		if ($reflectionClass->implementsInterface('f_persistentdocument_PersistentDocument'))
 		{
-			list($moduleName, $persDoc ,$documentName) = explode('_', $phpClass);
+			list($moduleName, $persDoc, $documentName) = explode('_', $phpClass);
 			if ($persDoc === 'persistentdocument')
 			{
 				$model = f_persistentdocument_PersistentDocumentModel::getInstance($moduleName, $documentName);
@@ -197,7 +202,21 @@ class webservices_WsdlTypes
 			}
 			return null;
 		}
-		return webservices_XsdComplex::OBJECT($phpClass);	
+		else
+		{
+			$objType = webservices_XsdComplex::OBJECT($phpClass);
+			$objModel = BeanUtils::getBeanModel($reflectionClass);
+			foreach ($objModel->getBeanPropertiesInfos() as $propName => $beanPropertyInfo)
+			{
+				$wsType = webservices_XsdComplex::FROM_BEAN_PROPERTYINFO($beanPropertyInfo);
+				if ($wsType !== null)
+				{
+					$objType->addXsdElement($propName, $wsType);
+				}
+			}
+			return $objType;
+		}
+		//return webservices_XsdComplex::OBJECT($phpClass);
 	}
 	
 	/**
@@ -206,15 +225,14 @@ class webservices_WsdlTypes
 	public static function getDefaultModelPopertyNames($model)
 	{
 		$result = array();
-		$internalProperties = array("author", "model", "authorid", "creationdate", "modificationdate", 
-				"metas", "modelversion", "documentversion", "metastring", "s18s");
+		$internalProperties = array("author", "model", "authorid", "creationdate", "modificationdate", "metas", "modelversion", "documentversion", "metastring", "s18s");
 		if (!$model->publishOnDayChange())
 		{
-			$internalProperties[] ="startpublicationdate";
-			$internalProperties[] ="endpublicationdate";
+			$internalProperties[] = "startpublicationdate";
+			$internalProperties[] = "endpublicationdate";
 		}
 		
-		foreach ($model->getEditablePropertiesInfos() as $propertyInfo) 
+		foreach ($model->getEditablePropertiesInfos() as $propertyInfo)
 		{
 			if (!in_array($propertyInfo->getName(), $internalProperties))
 			{
@@ -264,17 +282,20 @@ class webservices_WsdlTypesService extends BaseService
 	protected function getLocalizedtModelPopertyNames($model, $exludedProperties = array())
 	{
 		$result = array('id');
-		foreach ($model->getEditablePropertiesInfos() as $propertyInfo) 
+		foreach ($model->getEditablePropertiesInfos() as $propertyInfo)
 		{
-		if (in_array($propertyInfo->getName(), $exludedProperties)) {continue;}
+			if (in_array($propertyInfo->getName(), $exludedProperties))
+			{
+				continue;
+			}
 			if ($propertyInfo->isLocalized())
 			{
 				$result[] = $propertyInfo->getName();
 			}
 		}
 		return $result;
-	}	
-
+	}
+	
 	/**
 	 * @param f_persistentdocument_PersistentDocumentModel $model
 	 * @param array $exludedProperties
@@ -283,9 +304,12 @@ class webservices_WsdlTypesService extends BaseService
 	protected function getScalarPopertyNames($model, $exludedProperties = array())
 	{
 		$result = array();
-		foreach ($model->getEditablePropertiesInfos() as $propertyInfo) 
+		foreach ($model->getEditablePropertiesInfos() as $propertyInfo)
 		{
-			if (in_array($propertyInfo->getName(), $exludedProperties)) {continue;}
+			if (in_array($propertyInfo->getName(), $exludedProperties))
+			{
+				continue;
+			}
 			if (!$propertyInfo->isDocument())
 			{
 				$result[] = $propertyInfo->getName();

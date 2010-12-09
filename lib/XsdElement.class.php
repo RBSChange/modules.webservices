@@ -193,6 +193,105 @@ class webservices_XsdElement
 		}
 		return $data;		
 	}
+	
+	/**
+	 * @param string $phpClass
+	 * @param string $propName
+	 * @param f_mvc_BeanModel $model
+	 * @return webservices_XsdElement|null
+	 */
+	public static function OBJECT_PROPERTY($phpClass, $propName, $model = null)
+	{
+		if ($model === null)
+		{
+			$model = new f_mvc_DynBeanModel($phpClass);
+		}
+		if (!$model->hasBeanProperty($propName))
+		{
+			return null;
+		}
+		return self::FROM_BEAN_PROPERTYINFO($model->getBeanPropertyInfo($propName));
+	}
+	
+	/**
+	 * @param BeanPropertyInfo $beanPropertyInfo
+	 * @return webservices_XsdElement|null
+	 */
+	public static function FROM_BEAN_PROPERTYINFO($beanPropertyInfo)
+	{
+		$multiple = $beanPropertyInfo->getCardinality() > 1 || $beanPropertyInfo->getCardinality() == -1;
+		$elem = null;
+		switch ($beanPropertyInfo->getType())
+		{
+			case BeanPropertyType::BOOLEAN :
+				if ($multiple)
+				{
+					$elem = webservices_XsdComplexArray::SIMPLETYPEARRAY(webservices_XsdElement::BOOLEAN(true));
+				}
+				else 
+				{
+					$elem = webservices_XsdElement::BOOLEAN(true);
+				}
+				break;
+			case BeanPropertyType::INTEGER :
+				if ($multiple)
+				{
+					$elem = webservices_XsdComplexArray::SIMPLETYPEARRAY(webservices_XsdElement::INTEGER($beanPropertyInfo->isRequired()));
+				}
+				else
+				{
+					$elem = webservices_XsdElement::INTEGER($beanPropertyInfo->isRequired());
+				}
+				break;
+			case BeanPropertyType::DOUBLE :
+				if ($multiple)
+				{
+					$elem = webservices_XsdComplexArray::SIMPLETYPEARRAY(webservices_XsdElement::DOUBLE($beanPropertyInfo->isRequired()));
+				}
+				else 
+				{
+					$elem = webservices_XsdElement::DOUBLE($beanPropertyInfo->isRequired());
+				}
+				break;
+			case BeanPropertyType::DATETIME :
+			case BeanPropertyType::DATE :
+				if ($multiple)
+				{
+					$elem = webservices_XsdComplexArray::SIMPLETYPEARRAY(webservices_XsdElement::DATETIME($beanPropertyInfo->isRequired()));
+				}
+				else 
+				{
+					$elem = webservices_XsdElement::DATETIME($beanPropertyInfo->isRequired());
+				}
+				break;
+			case BeanPropertyType::STRING :
+				if ($multiple)
+				{
+					$elem = webservices_XsdComplexArray::SIMPLETYPEARRAY(webservices_XsdElement::STRING($beanPropertyInfo->isRequired()));
+				}
+				else 
+				{
+					$elem = webservices_XsdElement::STRING($beanPropertyInfo->isRequired());
+				}
+				break;
+			case BeanPropertyType::DOCUMENT:
+				$docModel = f_persistentdocument_PersistentDocumentModel::getInstanceFromDocumentModelName($beanPropertyInfo->getDocumentType());
+				$propertyNames = webservices_WsdlTypes::getDefaultModelPopertyNames($docModel);
+				$elem = webservices_XsdComplex::DOCUMENTMODEL($docModel, null, $propertyNames);
+				break;
+			case BeanPropertyType::CLASS_TYPE:
+				if ($multiple)
+				{
+					$elem = webservices_XsdComplexArray::OBJECTARRAY(webservices_WsdlTypes::getComplexType($beanPropertyInfo->getClassName()));
+				}
+				else
+				{
+					$elem = webservices_WsdlTypes::getComplexType($beanPropertyInfo->getClassName());
+				}
+				break;
+		}
+		return $elem;
+	}
 }
 
 class webservices_XsdComplex extends webservices_XsdElement
@@ -264,15 +363,28 @@ class webservices_XsdComplex extends webservices_XsdElement
 	/**
 	 * @param string $name
 	 * @param string $phpClass
+	 * @param string[] $propNames
 	 * @return webservices_XsdComplex
 	 */
-	public static function OBJECT($name, $phpClass = null)
+	public static function OBJECT($name, $phpClass = null, $propNames = null)
 	{
 		$result = new self($name, false, 'tns');
 		$result->phpClass = ($phpClass !== null) ? $phpClass : $name;
+		if ($propNames !== null && f_util_ClassUtils::classExists($result->phpClass))
+		{
+			$class = new ReflectionClass($result->phpClass);
+			$model = BeanUtils::getBeanModel($class);
+			foreach ($propNames as $propName)
+			{
+				$wsType = self::OBJECT_PROPERTY($result->phpClass, $propName, $model);
+				if ($wsType !== null)
+				{
+					$result->addXsdElement($propName, $wsType);
+				}
+			}
+		}
 		return $result;
 	}
-	
 	
 	/**
 	 * @param f_persistentdocument_PersistentDocumentModel $model
