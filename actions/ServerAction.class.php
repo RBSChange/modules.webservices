@@ -15,10 +15,11 @@ class webservices_ServerAction extends f_action_BaseAction
 		$soapRequest = file_get_contents("php://input");
 		$moduleName = $request->getModuleParameter('webservices', 'moduleName');
 		$serviceName = $request->getModuleParameter('webservices', 'serviceName');
+		
 		$className = $moduleName . "_" . ucfirst($serviceName) . "WebService";
 		
 		$secureId = webservices_WsService::getInstance()->getSecureExcuteByClass($className);
-
+		
 		if ($request->hasParameter("wsdl") || $request->hasParameter("WSDL"))
 		{
 			$wsdl = $this->getWsdl($className);
@@ -68,14 +69,22 @@ class webservices_ServerAction extends f_action_BaseAction
 			Framework::debug("SOAP: add XML Header");
 			$soapRequest = '<?xml version="1.0" encoding="UTF-8"?>'.$soapRequest;
 		}
-		ob_start();
-		$server->handle($soapRequest);
-		$out = ob_get_clean();
-		if (Framework::isDebugEnabled())
+		try
 		{
-			Framework::debug("SOAP RESPONSE : $out");
+			ob_start();
+			$server->handle($soapRequest);
+			$out = ob_get_clean();
+			if (Framework::isDebugEnabled())
+			{
+				Framework::debug("SOAP RESPONSE : $out");
+			}
+			echo $out;
 		}
-		echo $out;
+		catch (Exception $e)
+		{
+			Framework::exception($e);
+			$server->fault($e->getCode(), $e->getMessage());
+		}
 		return null;
 	}
 
