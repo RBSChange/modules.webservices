@@ -87,8 +87,8 @@ class webservices_ModuleService extends ModuleBaseService
 
 		$classInfo = explode("_", $className);
 		$moduleName = $classInfo[0];
-		$serviceName = strtolower(f_util_ArrayUtils::lastElement($classInfo));
-		if (f_util_StringUtils::endsWith($serviceName, "webservice"))
+		$serviceName = f_util_ArrayUtils::lastElement($classInfo);
+		if (f_util_StringUtils::endsWith($serviceName, "WebService"))
 		{
 			$serviceName = substr($serviceName, 0, -10);
 		}
