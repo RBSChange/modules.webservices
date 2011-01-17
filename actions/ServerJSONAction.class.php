@@ -5,59 +5,27 @@
  */
 class webservices_ServerJSONAction extends f_action_BaseJSONAction
 {
-
 	/**
 	 * @param Context $context
 	 * @param Request $request
 	 */
 	public function _execute($context, $request)
 	{
-		try 
+		try
 		{
-			$moduleName = $request->getModuleParameter('webservices', 'moduleName');
-			$serviceName = $request->getModuleParameter('webservices', 'serviceName');
-			$className = $moduleName . "_" . ucfirst($serviceName) . "WebService";
-			
-			if ($request->hasParameter("info") || $request->hasParameter("INFO"))
+			$callData = $this->parseRequest($context, $request);
+			if (isset($callData["info"]))
 			{
-				$template = TemplateLoader::getInstance()->setMimeContentType(K::HTML)
-					->setPackageName('modules_webservices')
-					->setDirectory('templates')->load('jsondef');
-				$service = new webservices_ServiceJSONProxy($className);
-				$template->setAttribute('jsonurl', Framework::getUIBaseUrl() . "/servicesjson/$moduleName/$serviceName");
-				$template->setAttribute('moduleName', $moduleName);
-				$template->setAttribute('serviceName', $serviceName);
-				$template->setAttribute('jsonService', $service);
-				echo $template->execute();
+				return $this->doInfo($callData);
+			}
+			
+			if (!$this->doSecurity($callData))
+			{
 				return null;
 			}
 		
-			$secureId = webservices_WsService::getInstance()->getSecureExcuteByClass($className);			
-			if ($secureId > 0)
-			{
-				// Basic authentication
-				$realm = "Please provide an admin/password couple for $serviceName service";
-				if (!isset($_SERVER['PHP_AUTH_USER']))
-				{
-					return $this->mustLogin($realm);
-				}
-						
-				$login = $_SERVER['PHP_AUTH_USER'];
-				$password = $_SERVER['PHP_AUTH_PW'];
-				
-				$user = users_UserService::getInstance()->getIdentifiedBackendUser($login, $password);
-				if ($user === null)
-				{
-					return $this->mustLogin($realm);
-				}
-				if (!f_permission_PermissionService::getInstance()->hasPermission($user, 'modules_webservices.Execute', $secureId))
-				{
-					return $this->mustLogin($realm);
-				}
-			}
-			
 			header('Content-Type: application/json; charset=utf-8');
-			$message = $request->getParameter('REQUEST');
+			$message = $callData["message"];
 			if (empty($message) || $message[0] !== '{')
 			{
 				throw new Exception("Bad REQUEST : " . $message);
@@ -73,20 +41,120 @@ class webservices_ServerJSONAction extends f_action_BaseJSONAction
 			{
 				throw new Exception("Invalid JSON REQUEST arguments" . var_export($arguments, true));
 			}
-			$service = new webservices_ServiceJSONProxy($className);
+			$service = $this->getJSONProxy($callData);
 			$service->handle($method, $arguments);
 		}
 		catch (Exception $e)
 		{
-			header('Content-Type: application/json; charset=utf-8');
-			$error = array('error' => $e->getMessage());
-			if (Framework::inDevelopmentMode())
-			{
-				$error['stackTrace'] = $e->getTraceAsString();
-			}
-			echo JsonService::getInstance()->encode($error);
+			$this->handleException($e);
 		}
+		
 		return null;
+	}
+	
+	/**
+	 * @param array $callData
+	 * @return boolean
+	 */
+	protected function doSecurity($callData)
+	{
+		$serviceName = $callData["serviceName"];
+		$className = $callData["className"];
+		
+		$secureId = webservices_WsService::getInstance()->getSecureExcuteByClass($className);			
+		if ($secureId > 0)
+		{
+			// Basic authentication
+			$realm = "Please provide an admin/password couple for $serviceName service";
+			if (!isset($_SERVER['PHP_AUTH_USER']))
+			{
+				$this->mustLogin($realm);
+				return false;
+			}
+					
+			$login = $_SERVER['PHP_AUTH_USER'];
+			$password = $_SERVER['PHP_AUTH_PW'];
+				
+			$user = users_UserService::getInstance()->getIdentifiedBackendUser($login, $password);
+			if ($user === null)
+			{
+				$this->mustLogin($realm);
+				return false;
+			}
+			if (!f_permission_PermissionService::getInstance()->hasPermission($user, 'modules_webservices.Execute', $secureId))
+			{
+				$this->mustLogin($realm);
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * @param array $callData
+	 */
+	protected function doInfo($callData)
+	{
+		$moduleName = $callData["moduleName"];
+		$serviceName = $callData["serviceName"];
+		$className = $callData["className"];
+		
+		$template = TemplateLoader::getInstance()->setMimeContentType(K::HTML)
+			->setPackageName('modules_webservices')
+			->setDirectory('templates')->load('jsondef');
+		$service = new webservices_ServiceJSONProxy($className);
+		$template->setAttribute('jsonurl', Framework::getUIBaseUrl() . "/servicesjson/$moduleName/$serviceName");
+		$template->setAttribute('moduleName', $moduleName);
+		$template->setAttribute('serviceName', $serviceName);
+		$template->setAttribute('jsonService', $service);
+		echo $template->execute();
+		return null;
+	}
+	
+	/**
+	 * @param array $callData
+	 * @return webservices_ServiceJSONProxy
+	 */
+	protected function getJSONProxy($callData)
+	{
+		$className = $callData["className"];
+		return new webservices_ServiceJSONProxy($className);
+	}
+	
+	/**
+	 * @param Exception $e
+	 */
+	protected function handleException($e)
+	{
+		header('Content-Type: application/json; charset=utf-8');
+		$error = array('error' => $e->getMessage());
+		if (Framework::inDevelopmentMode())
+		{
+			$error['stackTrace'] = $e->getTraceAsString();
+		}
+		echo JsonService::getInstance()->encode($error);
+	}
+	
+	/**
+	 * @param Context $context
+	 * @param Request $request
+	 * @return array
+	 */
+	protected function parseRequest($context, $request)
+	{
+		$moduleName = $request->getModuleParameter('webservices', 'moduleName');
+		$serviceName = $request->getModuleParameter('webservices', 'serviceName');
+		$className = $moduleName . "_" . ucfirst($serviceName) . "WebService";
+		$callData = array("moduleName" => $moduleName, "serviceName" => $serviceName, "className" => $className);
+		
+		if ($request->hasParameter("info") || $request->hasParameter("INFO"))
+		{
+			$callData["info"] = true;
+		}
+		
+		$callData["message"] = $request->getParameter('REQUEST');
+		
+		return $callData;
 	}
 
 	function isSecure()

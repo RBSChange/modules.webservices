@@ -18,33 +18,61 @@ class webservices_ServiceJSONProxy
 	
 	function handle($method, $arguments)
 	{
-		$class = new ReflectionClass($this->service);
-		$args = array();
-		foreach ($class->getMethod($method)->getParameters() as $parameter)
+		try
 		{
-			if (isset($arguments[$parameter->getName()]))
+			$class = new ReflectionClass($this->service);
+			$args = array();
+			foreach ($class->getMethod($method)->getParameters() as $parameter)
 			{
-				$args[] = $arguments[$parameter->getName()];
+				if (isset($arguments[$parameter->getName()]))
+				{
+					$args[] = $arguments[$parameter->getName()];
+				}
+				else
+				{
+					$args[] = null;
+				}
 			}
-			else
+			$res = f_util_ClassUtils::callMethodArgsOn($this->service, $method, $args);
+			if ($res != null)
 			{
-				$args[] = null;
+				$typeList = $this->getTypeList();
+				$responseType = $typeList->getType($method."Response");
+				$resultTypeName = $responseType->getXsdElement($method."Result")->getType();
+				$resultType = $typeList->getType($resultTypeName);
+				if ($resultType === null)
+				{
+					$resultType = webservices_WsdlTypes::getSimpleType($resultTypeName);
+				}
+				$res = $resultType->formatValue($res);
 			}
+			$this->writeResult($res);
 		}
-		$res = f_util_ClassUtils::callMethodArgsOn($this->service, $method, $args);
-		if ($res != null)
+		catch (Exception $e)
 		{
-			$typeList = $this->getTypeList();
-			$responseType = $typeList->getType($method."Response");
-			$resultTypeName = $responseType->getXsdElement($method."Result")->getType();
-			$resultType = $typeList->getType($resultTypeName);
-			if ($resultType === null)
-			{
-				$resultType = webservices_WsdlTypes::getSimpleType($resultTypeName);
-			}
-			$res = $resultType->formatValue($res);
+			$this->writeError($e);
 		}
+	}
+	
+	/**
+	 * @param mixed $res
+	 */
+	function writeResult($res)
+	{
 		echo JsonService::getInstance()->encode(array('result' => $res));
+	}
+	
+	/**
+	 * @param Exception $e
+	 */
+	function writeError($e)
+	{
+		$error = array('error' => $e->getMessage());
+		if (Framework::inDevelopmentMode())
+		{
+			$error['stackTrace'] = $e->getTraceAsString();
+		}
+		echo JsonService::getInstance()->encode($error);
 	}
 	
 	/**
