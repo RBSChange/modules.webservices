@@ -93,11 +93,11 @@ class webservices_ModuleService extends ModuleBaseService
 			$serviceName = substr($serviceName, 0, -10);
 		}
 
-		$targetNameSpace = Framework::getBaseUrl()."/ws/".$moduleName."/".$serviceName;
+		$targetNameSpace = Framework::getUIBaseUrl() . "/ws/".$moduleName."/".$serviceName;
 		$baseWsdl = str_replace("TARGET_NAME_SPACE", $targetNameSpace, $baseWsdl);
 		$baseWsdl = str_replace("MY_SERVICE", $serviceName, $baseWsdl);
 		$baseWsdl = str_replace("MY_MODULE", $moduleName, $baseWsdl);
-		$baseWsdl = str_replace("MY_FQDN", Framework::getBaseUrl(), $baseWsdl);
+		$baseWsdl = str_replace("MY_FQDN", Framework::getUIBaseUrl(), $baseWsdl);
 
 		$wsdl = f_util_DOMUtils::fromString($baseWsdl);
 		$wsdl->registerNamespace("tns", $targetNameSpace);

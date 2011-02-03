@@ -41,5 +41,6 @@ class commands_CompileWsdl extends commands_AbstractChangedevCommand
 		$this->message("== Compile wsdls ==");
 		$this->loadFramework();
 		webservices_ModuleService::getInstance()->compileWsdls();
+		return $this->quitOk("webservices compiled successfully.");
 	}
 }
