@@ -6,4 +6,7 @@
   <key id="phpclass-help">Classe PHP utilisé pour executer les méthodes du webservice</key>
   <key id="secured">Sécurisé</key>
   <key id="secured-help">Le web service nécessite une authentification</key>
+  
+  <key id="currenturljson">Url de test JSON</key>  
+
 </i18n>

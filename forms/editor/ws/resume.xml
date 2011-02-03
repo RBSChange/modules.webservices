@@ -5,6 +5,7 @@
     <property name="author" labeli18n="modules.uixul.bo.doceditor.property.Author"/>
     <property name="creationdate" labeli18n="modules.uixul.bo.doceditor.property.Creationdate"/>
     <property name="currenturl" labeli18n="modules.uixul.bo.doceditor.property.Currenturl" class="link"/>
+    <property name="currenturljson" labeli18n="modules.webservices.document.ws.Currenturljson" class="link"/>
   </section>
   <section name="publication" linkedtab="publication" labeli18n="modules.uixul.bo.doceditor.section.Status" image="{IconsBase}/small/status.png">
     <property name="status" labeli18n="modules.uixul.bo.doceditor.property.Status"/>

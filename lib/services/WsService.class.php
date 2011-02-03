@@ -327,6 +327,7 @@ class webservices_WsService extends f_persistentdocument_DocumentService
 		list($moduleName , $serviceName) = explode('_', str_replace('WebService', '', $class));
 		$serviceName = strtolower(substr($serviceName, 0, 1)) . substr($serviceName, 1);
 		$resume['properties']['currenturl'] =  Framework::getUIBaseUrl() . '/webservices/'. $moduleName. '/' . $serviceName . '?wsdl';
+		$resume['properties']['currenturljson'] =  Framework::getUIBaseUrl() . '/servicesjson/'. $moduleName. '/' . $serviceName . '?info';
 		return $resume;
 	}
 
