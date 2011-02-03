@@ -4,7 +4,7 @@
 <title>Détail du service</title>
 </head>
 <body>
-	<h1>Méthod du service : ${moduleName} / ${serviceName}</h1>
+	<h1>Méthodes du service : ${moduleName} / ${serviceName}</h1>
 	<tal:block tal:repeat="method jsonService/getMethods">
 	<h3>${repeat/method/key}</h3>
 	<form action="${jsonurl}" target="_blanck">
