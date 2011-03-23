@@ -46,6 +46,12 @@ class webservices_ServiceJSONProxy
 				}
 				$res = $resultType->formatValue($res);
 			}
+			
+			if (Framework::isInfoEnabled())
+			{
+				webservices_ModuleService::getInstance()->log("JSON RESPONSE :" . var_export($res, true));
+			}
+			
 			$this->writeResult($res);
 		}
 		catch (Exception $e)

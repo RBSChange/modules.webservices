@@ -69,14 +69,20 @@ class webservices_ServerAction extends f_action_BaseAction
 			Framework::debug("SOAP: add XML Header");
 			$soapRequest = '<?xml version="1.0" encoding="UTF-8"?>'.$soapRequest;
 		}
+		
+		if (Framework::isInfoEnabled())
+		{
+			webservices_ModuleService::getInstance()->log("SOAP REQUEST $serviceName:" . $soapRequest);
+		}
+		
 		try
 		{
 			ob_start();
 			$server->handle($soapRequest);
 			$out = ob_get_clean();
-			if (Framework::isDebugEnabled())
+			if (Framework::isInfoEnabled())
 			{
-				Framework::debug("SOAP RESPONSE : $out");
+				webservices_ModuleService::getInstance()->log("SOAP RESPONSE $serviceName:" . $out);
 			}
 			echo $out;
 		}

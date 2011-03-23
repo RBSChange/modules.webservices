@@ -8,6 +8,12 @@ class webservices_ModuleService extends ModuleBaseService
 	 * @var webservices_ModuleService
 	 */
 	private static $instance = null;
+	
+	/**
+	 * 
+	 * @var string
+	 */
+	private $logFilePath;
 
 	/**
 	 * @return webservices_ModuleService
@@ -19,6 +25,20 @@ class webservices_ModuleService extends ModuleBaseService
 			self::$instance = self::getServiceClassInstance(get_class());
 		}
 		return self::$instance;
+	}
+	
+	protected function __construct()
+	{
+		$this->logFilePath = f_util_FileUtils::buildWebeditPath('log', 'webservices', 'webservices.log');
+		if (!file_exists($this->logFilePath))
+		{
+			f_util_FileUtils::writeAndCreateContainer($this->logFilePath, gmdate('Y-m-d H:i:s')."\t Created");
+		}
+	}
+	
+	public function log($stringLine)
+	{
+		error_log("\n". gmdate('Y-m-d H:i:s')."\t".$stringLine, 3, $this->logFilePath);
 	}
 
 	/**

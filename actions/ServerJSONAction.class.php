@@ -41,6 +41,12 @@ class webservices_ServerJSONAction extends f_action_BaseJSONAction
 			{
 				throw new Exception("Invalid JSON REQUEST arguments" . var_export($arguments, true));
 			}
+			
+			if (Framework::isInfoEnabled())
+			{
+				webservices_ModuleService::getInstance()->log("JSON REQUEST :" . var_export($json, true));
+			}
+		
 			$service = $this->getJSONProxy($callData);
 			$service->handle($method, $arguments);
 		}
