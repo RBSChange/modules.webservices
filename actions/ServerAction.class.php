@@ -89,8 +89,8 @@ class webservices_ServerAction extends f_action_BaseAction
 		catch (Exception $e)
 		{
 			Framework::exception($e);
-			webservices_ModuleService::getInstance()->log("SOAP RESPONSE EXCEPTION $serviceName: " . $e->getCode() .','. $e->getMessage());
-			$server->fault($e->getCode(), $e->getMessage());
+			webservices_ModuleService::getInstance()->log("SOAP RESPONSE EXCEPTION $serviceName: Client." . $e->getCode() .','. $e->getMessage());
+			$server->fault("Client.".$e->getCode(), $e->getMessage());
 		}
 		return null;
 	}
