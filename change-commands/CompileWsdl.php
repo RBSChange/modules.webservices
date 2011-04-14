@@ -17,11 +17,6 @@ class commands_CompileWsdl extends commands_AbstractChangedevCommand
 		return "compile wsdl for declared webservices";
 	}
 	
-	function isHidden()
-	{
-		return true;
-	}
-
 	/**
 	 * @param String[] $params
 	 * @param array<String, String> $options where the option array key is the option name, the potential option value or true
