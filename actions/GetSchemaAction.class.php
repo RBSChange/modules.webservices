@@ -14,14 +14,7 @@ class webservices_GetSchemaAction extends f_action_BaseAction
 	{
 		$moduleName = $request->getModuleParameter('webservices', 'moduleName');
 		$serviceName = $request->getModuleParameter('webservices', 'serviceName');
-		$serviceConf = Framework::getConfiguration("modules/$moduleName/webservices/$serviceName", false);
-		if (!$serviceConf)
-		{
-			f_web_http_Header::setStatus('500');
-			echo "Service not found $moduleName - $serviceName";
-			return null;
-		}
-		$className = $serviceConf["class"];
+		$className = $moduleName . "_" . ucfirst($serviceName) . "WebService";
 		header('Content-Type: text/xml');	
 		echo $this->getWsdl($className);
 		return null;
