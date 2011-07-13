@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<buildpath>
-	<buildpathentry kind="src" path="changedev-commands"/>
-	<buildpathentry kind="con" path="org.eclipse.php.core.LANGUAGE"/>
-	<buildpathentry kind="src" path="lib"/>
-	<buildpathentry kind="src" path="actions"/>
-	<buildpathentry combineaccessrules="false" kind="prj" path="/framework-3.0.0"/>
-	<buildpathentry kind="src" path="setup"/>
-</buildpath>

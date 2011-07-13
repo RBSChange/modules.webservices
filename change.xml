@@ -3,7 +3,7 @@
   <name>webservices</name>
   <type>change-module</type>
   <version>3.5.0</version>
-  <license>com</license>
+  <license>os</license>
   <repository>public</repository>
   <description>Webservices module: expose soap based web services simply</description>
   <dependencies>
