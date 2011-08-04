@@ -3,12 +3,12 @@
  * webservices_CompileAction
  * @package modules.webservices.actions
  */
-class webservices_CompileAction extends f_action_BaseJSONAction
+class webservices_CompileAction extends change_JSONAction
 {
 
 	/**
-	 * @param Context $context
-	 * @param Request $request
+	 * @param change_Context $context
+	 * @param change_Request $request
 	 */
 	public function _execute($context, $request)
 	{

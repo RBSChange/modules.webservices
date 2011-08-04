@@ -3,12 +3,12 @@
  * webservices_serverAction
  * @package modules.webservices.actions
  */
-class webservices_ServerAction extends f_action_BaseAction
+class webservices_ServerAction extends change_Action
 {
 
 	/**
-	 * @param Context $context
-	 * @param Request $request
+	 * @param change_Context $context
+	 * @param change_Request $request
 	 */
 	public function _execute($context, $request)
 	{

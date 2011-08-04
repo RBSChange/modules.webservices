@@ -3,12 +3,12 @@
  * webservices_GetSchemaAction
  * @package modules.webservices.actions
  */
-class webservices_GetSchemaAction extends f_action_BaseAction
+class webservices_GetSchemaAction extends change_Action
 {
 
 	/**
-	 * @param Context $context
-	 * @param Request $request
+	 * @param change_Context $context
+	 * @param change_Request $request
 	 */
 	public function _execute($context, $request)
 	{
