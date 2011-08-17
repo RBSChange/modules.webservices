@@ -105,7 +105,7 @@ class webservices_ServerJSONAction extends change_JSONAction
 		$serviceName = $callData["serviceName"];
 		$className = $callData["className"];
 		
-		$template = TemplateLoader::getInstance()->setMimeContentType(K::HTML)
+		$template = TemplateLoader::getInstance()->setMimeContentType('html')
 			->setPackageName('modules_webservices')
 			->setDirectory('templates')->load('jsondef');
 		$service = new webservices_ServiceJSONProxy($className);
