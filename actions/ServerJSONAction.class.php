@@ -87,7 +87,7 @@ class webservices_ServerJSONAction extends change_JSONAction
 				$this->mustLogin($realm);
 				return false;
 			}
-			if (!f_permission_PermissionService::getInstance()->hasPermission($user, 'modules_webservices.Execute', $secureId))
+			if (!change_PermissionService::getInstance()->hasPermission($user, 'modules_webservices.Execute', $secureId))
 			{
 				$this->mustLogin($realm);
 				return false;

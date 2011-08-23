@@ -45,7 +45,7 @@ class webservices_ServerAction extends change_Action
 			{
 				return $this->mustLogin($realm);
 			}
-			if (!f_permission_PermissionService::getInstance()->hasPermission($user, 'modules_webservices.Execute', $secureId))
+			if (!change_PermissionService::getInstance()->hasPermission($user, 'modules_webservices.Execute', $secureId))
 			{
 				return $this->mustLogin($realm);
 			}
