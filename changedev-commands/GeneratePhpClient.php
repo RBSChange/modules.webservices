@@ -1,5 +1,5 @@
 <?php
-class commands_GeneratePhpClient extends commands_AbstractChangedevCommand
+class commands_GeneratePhpClient extends c_ChangescriptCommand
 {
 	/**
 	 * @return String

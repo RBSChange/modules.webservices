@@ -1,5 +1,5 @@
 <?php
-class commands_CompileWsdl extends commands_AbstractChangedevCommand
+class commands_CompileWsdl extends c_ChangescriptCommand
 {
 	/**
 	 * @return String
@@ -15,6 +15,16 @@ class commands_CompileWsdl extends commands_AbstractChangedevCommand
 	function getDescription()
 	{
 		return "compile wsdl for declared webservices";
+	}
+	
+	/**
+	 * @see c_ChangescriptCommand::getEvents()
+	 */
+	public function getEvents()
+	{
+		return array(
+			array('target' => 'compile-all'),
+		);
 	}
 	
 	/**

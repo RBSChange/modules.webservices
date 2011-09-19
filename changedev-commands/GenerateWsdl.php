@@ -1,5 +1,5 @@
 <?php
-class commands_GenerateWsdl extends commands_AbstractChangedevCommand
+class commands_GenerateWsdl extends c_ChangescriptCommand
 {
 	/**
 	 * @return String
