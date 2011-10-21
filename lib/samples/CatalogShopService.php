@@ -111,7 +111,7 @@ class samples_ShopWebService implements webservices_WebService
 	private function getShop($shopId)
 	{
 		$shop = DocumentHelper::getDocumentInstance($shopId, "modules_catalog/shop");
-		website_WebsiteModuleService::getInstance()->setCurrentWebsite($shop->getWebsite());
+		website_WebsiteService::getInstance()->setCurrentWebsite($shop->getWebsite());
 		return $shop;
 	}
 
