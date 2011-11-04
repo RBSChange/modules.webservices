@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<document xmlns="http://www.rbs.fr/schema/change-document/1.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.rbs.fr/schema/change-document/1.0 http://www.rbschange.fr/static/schema/change-document/1.0.xsd"
-	model-version="1.0" publish-on-day-change="false" backoffice-indexable="false" has-url="false"
-	icon="ws">
-	<properties>
-		<add name="phpclass" type="String" min-occurs="1"></add>
-		<add name="secured" type="Boolean" default-value="false"></add>
-	</properties>
-	<statuses default="DRAFT" />
+<document xmlns="http://www.rbs.fr/schema/change-document/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.rbs.fr/schema/change-document/1.0 http://www.rbschange.fr/static/schema/change-document/4.0.xsd" model-version="1.0" publish-on-day-change="false" backoffice-indexable="false" has-url="false" icon="ws">
+  <properties>
+    <property name="phpclass" type="String" min-occurs="1"/>
+    <property name="secured" type="Boolean" default-value="false"/>
+  </properties>
+  <statuses default="DRAFT"/>
 </document>
