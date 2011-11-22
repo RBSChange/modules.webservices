@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <i18n baseKey="m.webservices.document.ws" lcid="en_GB">
+  <include id="m.generic.document.document"/>
   <key id="currenturljson">JSON test URL</key>
   <key id="document-name">webservice</key>
   <key id="label-help">webservice's label</key>
