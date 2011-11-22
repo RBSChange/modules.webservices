@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<i18n baseKey="m.webservices.document.ws" lcid="en_GB">
+  <key id="currenturljson">JSON test URL</key>
+  <key id="document-name">webservice</key>
+  <key id="label-help">webservice's label</key>
+  <key id="phpclass">PHP class</key>
+  <key id="phpclass-help">PHP class used to execute webservice's methods</key>
+  <key id="secured">Secure</key>
+  <key id="secured-help">The webservice requires HTTP Basic authentication.</key>
+</i18n>
