@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <i18n baseKey="m.webservices.document.ws" lcid="en_GB">
   <include id="m.generic.document.document"/>
-  <key id="document-name">ws</key>
-  <key id="phpclass">[TO TRANSLATE] phpclass</key>
-  <key id="phpclass-help">[TO TRANSLATE] phpclass-help</key>
-  <key id="secured">[TO TRANSLATE] secured</key>
-  <key id="secured-help">[TO TRANSLATE] secured-help</key>
+  <key id="document-name">webservice</key>
+  <key id="phpclass">PHP class</key>
+  <key id="phpclass-help">PHP class used to execute webservice's methods</key>
+  <key id="secured">Secure</key>
+  <key id="secured-help">The webservice requires HTTP Basic authentication.</key>
+  <key id="currenturljson">JSON test URL</key>
 </i18n>
