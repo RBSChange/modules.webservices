@@ -85,6 +85,11 @@ class webservices_ModuleService extends ModuleBaseService
 	function compileWsdl($className)
 	{
 		Framework::info(__METHOD__ . " " . $className);
+		
+		$path = f_util_FileUtils::buildChangeBuildPath("wsdl", str_replace("_", DIRECTORY_SEPARATOR, $className) . '.types');
+		$types = $this->generateServiceTypeDefinitions($className);
+		f_util_FileUtils::writeAndCreateContainer($path, serialize($types), f_util_FileUtils::OVERRIDE);
+		
 		$path = f_util_FileUtils::buildChangeBuildPath("wsdl", str_replace("_", DIRECTORY_SEPARATOR, $className) . ".wsdl");
 		$wsdl = $this->generateWsdl($className);
 		f_util_FileUtils::writeAndCreateContainer($path, $wsdl, f_util_FileUtils::OVERRIDE);
