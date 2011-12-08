@@ -191,7 +191,7 @@ class webservices_WsdlTypes
 			return null;
 		}
 		$reflectionClass = new ReflectionClass($phpClass);
-		if ($reflectionClass->implementsInterface('f_persistentdocument_PersistentDocument'))
+		if ($reflectionClass->isSubclassOf('f_persistentdocument_PersistentDocument'))
 		{
 			list($moduleName, $persDoc, $documentName) = explode('_', $phpClass);
 			if ($persDoc === 'persistentdocument')
@@ -216,7 +216,6 @@ class webservices_WsdlTypes
 			}
 			return $objType;
 		}
-		//return webservices_XsdComplex::OBJECT($phpClass);
 	}
 	
 	/**

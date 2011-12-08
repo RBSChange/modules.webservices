@@ -53,7 +53,7 @@ class webservices_WebServiceBase implements webservices_WebService
 	
 	/**
 	 * 
-	 * @param f_persistentdocument_PersistentDocumentImpl $document
+	 * @param f_persistentdocument_PersistentDocument $document
 	 */
 	protected function deleteDocument($document)
 	{
