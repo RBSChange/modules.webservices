@@ -26,20 +26,6 @@ class commands_GenerateWsdl extends c_ChangescriptCommand
 		return count($params) == 1;
 	}
 
-	/**
-	 * @param Integer $completeParamCount the parameters that are already complete in the command line
-	 * @param String[] $params
-	 * @param array<String, String> $options where the option array key is the option name, the potential option value or true
-	 * @return String[] or null
-	 */
-	function getParameters($completeParamCount, $params, $options, $current)
-	{
-		if ($completeParamCount == 0)
-		{
-			$this->loadFramework();
-			return ClassResolver::getClassNames($current);
-		}
-	}
 
 	/**
 	 * @param String[] $params

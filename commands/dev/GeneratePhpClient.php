@@ -27,21 +27,6 @@ class commands_GeneratePhpClient extends c_ChangescriptCommand
 	}
 
 	/**
-	 * @param Integer $completeParamCount the parameters that are already complete in the command line
-	 * @param String[] $params
-	 * @param array<String, String> $options where the option array key is the option name, the potential option value or true
-	 * @return String[] or null
-	 */
-	function getParameters($completeParamCount, $params, $options, $current)
-	{
-		if ($completeParamCount == 0)
-		{
-			$this->loadFramework();
-			return ClassResolver::getClassNames($current);
-		}
-	}
-
-	/**
 	 * @param String[] $params
 	 * @param array<String, String> $options where the option array key is the option name, the potential option value or true
 	 * @see c_ChangescriptCommand::parseArgs($args)
