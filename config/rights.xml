@@ -12,7 +12,6 @@
 			<permission name="LoadPermissions.*" />
 			<permission name="SavePermissions.*" />
 			<permission name="GetPreferencesDocument" />
-			<permission name="EditLocale" />
 			<permission name="Order" />
 			<permission name="Move.*" />
 			<permission name="Load.*" />
