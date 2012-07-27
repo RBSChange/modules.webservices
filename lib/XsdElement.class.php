@@ -181,7 +181,7 @@ class webservices_XsdElement
 		return $data;
 	}
 	
-	public function formatPhpValue($data)
+	public function formatPhpValue($data, $outObject = null)
 	{
 		if ($this->type === 'dateTime' && !empty($data))
 		{
@@ -755,7 +755,7 @@ class webservices_XsdComplexArray extends webservices_XsdComplex
 		return $result;
 	}
 	
-	public function formatPhpValue($data)
+	public function formatPhpValue($data, $outObject = null)
 	{
 		$result = array();
 		if ($data !== null)
