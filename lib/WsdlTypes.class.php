@@ -191,7 +191,7 @@ class webservices_WsdlTypes
 			return null;
 		}
 		$reflectionClass = new ReflectionClass($phpClass);
-		if ($reflectionClass->isSubclassOf('f_persistentdocument_PersistentDocument'))
+		if ($reflectionClass->implementsInterface('f_persistentdocument_PersistentDocument'))
 		{
 			list($moduleName, $persDoc, $documentName) = explode('_', $phpClass);
 			if ($persDoc === 'persistentdocument')
@@ -216,6 +216,7 @@ class webservices_WsdlTypes
 			}
 			return $objType;
 		}
+		//return webservices_XsdComplex::OBJECT($phpClass);
 	}
 	
 	/**
@@ -225,7 +226,7 @@ class webservices_WsdlTypes
 	{
 		$result = array();
 		$internalProperties = array("author", "model", "authorid", "creationdate", "modificationdate", "metas", "modelversion", "documentversion", "metastring", "s18s");
-		if (!$model->publishOnDayChange())
+		if (!$model->usePublicationDates())
 		{
 			$internalProperties[] = "startpublicationdate";
 			$internalProperties[] = "endpublicationdate";
@@ -242,7 +243,7 @@ class webservices_WsdlTypes
 	}
 }
 
-class webservices_WsdlTypesService extends BaseService
+class webservices_WsdlTypesService extends change_BaseService
 {
 	
 	/**

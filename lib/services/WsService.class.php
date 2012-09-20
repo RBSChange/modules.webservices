@@ -1,27 +1,10 @@
 <?php
 /**
- * webservices_WsService
  * @package modules.webservices
+ * @method webservices_WsService getInstance()
  */
 class webservices_WsService extends f_persistentdocument_DocumentService
 {
-	/**
-	 * @var webservices_WsService
-	 */
-	private static $instance;
-
-	/**
-	 * @return webservices_WsService
-	 */
-	public static function getInstance()
-	{
-		if (self::$instance === null)
-		{
-			self::$instance = new self();
-		}
-		return self::$instance;
-	}
-
 	/**
 	 * @return webservices_persistentdocument_ws
 	 */
@@ -38,7 +21,7 @@ class webservices_WsService extends f_persistentdocument_DocumentService
 	 */
 	public function createQuery()
 	{
-		return $this->pp->createQuery('modules_webservices/ws');
+		return $this->getPersistentProvider()->createQuery('modules_webservices/ws');
 	}
 	
 	/**
@@ -49,9 +32,14 @@ class webservices_WsService extends f_persistentdocument_DocumentService
 	 */
 	public function createStrictQuery()
 	{
-		return $this->pp->createQuery('modules_webservices/ws', false);
+		return $this->getPersistentProvider()->createQuery('modules_webservices/ws', false);
 	}
 	
+	/**
+	 * @param string $className
+	 * @return webservices_persistentdocument_ws | null
+	 * @throws Exception
+	 */
 	public function getSecureExcuteByClass($className)
 	{
 		$ws = $this->createQuery()
@@ -68,7 +56,7 @@ class webservices_WsService extends f_persistentdocument_DocumentService
 	
 	/**
 	 * @param webservices_persistentdocument_ws $document
-	 * @param Integer $parentNodeId Parent node ID where to save the document (optionnal => can be null !).
+	 * @param integer $parentNodeId Parent node ID where to save the document (optionnal => can be null !).
 	 * @return void
 	 */
 	protected function preSave($document, $parentNodeId)
@@ -88,7 +76,7 @@ class webservices_WsService extends f_persistentdocument_DocumentService
 
 	/**
 	 * @param webservices_persistentdocument_ws $document
-	 * @param Integer $parentNodeId Parent node ID where to save the document.
+	 * @param integer $parentNodeId Parent node ID where to save the document.
 	 * @return void
 	 */
 	protected function preInsert($document, $parentNodeId)

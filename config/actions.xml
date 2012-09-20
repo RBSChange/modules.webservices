@@ -9,15 +9,15 @@
 	<action name="createWs">
 		<parameter name="listWidget" />
 		<body><![CDATA[
-    		this.createDocumentEditor('modules_webservices_ws', listWidget.getSelectedItems()[0].id);
-    ]]></body>
+			this.createDocumentEditor('modules_webservices_ws', listWidget.getSelectedItems()[0].id);
+	]]></body>
 	</action>
 
 	<action name="compile">
 		<parameter name="listWidget" />
 		<body><![CDATA[
-    		this.executeJSON("Compile", {cmpref: listWidget.getSelectedItems()[0].id, lang:this.getContextLang()});
-    ]]></body>
+			this.executeJSON("Compile", {cmpref: listWidget.getSelectedItems()[0].id, lang:this.getContextLang()});
+	]]></body>
 	</action>
 	
 	<action name="onCompileSuccess">

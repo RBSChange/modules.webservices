@@ -17,8 +17,8 @@ class webservices_CompileAction extends change_JSONAction
 		{
 			webservices_ModuleService::getInstance()->compileWsdl($document->getPhpclass());
 			return $this->sendJSON(array('message' => 
-				LocaleService::getInstance()->transBO('m.webservices.bo.general.compiled-succefully', array(), array('label' => $document->getLabel()))));
+				LocaleService::getInstance()->trans('m.webservices.bo.general.compiled-succefully', array(), array('label' => $document->getLabel()))));
 		}
-		return $this->sendJSONError(LocaleService::getInstance()->transBO('m.webservices.bo.general.compiled-error'), true);
+		return $this->sendJSONError(LocaleService::getInstance()->trans('m.webservices.bo.general.compiled-error'), true);
 	}
 }

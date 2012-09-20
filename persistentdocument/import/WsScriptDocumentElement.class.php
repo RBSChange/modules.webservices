@@ -5,15 +5,15 @@
  */
 class webservices_WsScriptDocumentElement extends import_ScriptDocumentElement
 {
-    /**
-     * @return webservices_persistentdocument_ws
-     */
-    protected function initPersistentDocument()
-    {
-    	return webservices_WsService::getInstance()->getNewDocumentInstance();
-    }
-    
-    /**
+	/**
+	 * @return webservices_persistentdocument_ws
+	 */
+	protected function initPersistentDocument()
+	{
+		return webservices_WsService::getInstance()->getNewDocumentInstance();
+	}
+	
+	/**
 	 * @return f_persistentdocument_PersistentDocumentModel
 	 */
 	protected function getDocumentModel()

@@ -105,9 +105,7 @@ class webservices_ServerJSONAction extends change_JSONAction
 		$serviceName = $callData["serviceName"];
 		$className = $callData["className"];
 		
-		$template = TemplateLoader::getInstance()->setMimeContentType('html')
-			->setPackageName('modules_webservices')
-			->setDirectory('templates')->load('jsondef');
+		$template = change_TemplateLoader::getNewInstance()->setExtension('html')->load('modules', 'webservices', 'templates', 'jsondef');
 		$service = new webservices_ServiceJSONProxy($className);
 		$template->setAttribute('jsonurl', Framework::getUIBaseUrl() . "/servicesjson/$moduleName/$serviceName");
 		$template->setAttribute('moduleName', $moduleName);

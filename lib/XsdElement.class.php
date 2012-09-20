@@ -181,7 +181,7 @@ class webservices_XsdElement
 		return $data;
 	}
 	
-	public function formatPhpValue($data)
+	public function formatPhpValue($data, $outObject = null)
 	{
 		if ($this->type === 'dateTime' && !empty($data))
 		{
@@ -356,7 +356,7 @@ class webservices_XsdComplex extends webservices_XsdElement
 	{
 		$result = new self('webservices_Document', true, 'tns');
 		$result->xsdElementArray['id'] = webservices_XsdElement::INTEGER(true);
-		$result->phpClass = "f_persistentdocument_PersistentDocument";
+		$result->phpClass = "f_persistentdocument_PersistentDocumentImpl";
 		return $result;
 	}
 	
@@ -538,7 +538,7 @@ class webservices_XsdComplex extends webservices_XsdElement
 	public function formatPhpValue($data, $outObject = null)
 	{
 		if ($data === null) {return null;}
-		if ($this->phpClass === "f_persistentdocument_PersistentDocument")
+		if ($this->phpClass === "f_persistentdocument_PersistentDocumentImpl")
 		{
 			list($id, $defined) = $this->getRawPhpPropertyValue($data, 'id');
 			$id = $defined ? intval($id) : 0;
@@ -553,7 +553,7 @@ class webservices_XsdComplex extends webservices_XsdElement
 		if ($this->phpClass !== null)
 		{
 			$reflectionClass = new ReflectionClass($this->phpClass);
-			if ($reflectionClass->isSubclassOf('f_persistentdocument_PersistentDocument'))
+			if ($reflectionClass->implementsInterface('f_persistentdocument_PersistentDocument'))
 			{
 				$isPersitentDoc = true;
 				list($id, $defined) = $this->getRawPhpPropertyValue($data, 'id');
@@ -755,7 +755,7 @@ class webservices_XsdComplexArray extends webservices_XsdComplex
 		return $result;
 	}
 	
-	public function formatPhpValue($data)
+	public function formatPhpValue($data, $outObject = null)
 	{
 		$result = array();
 		if ($data !== null)

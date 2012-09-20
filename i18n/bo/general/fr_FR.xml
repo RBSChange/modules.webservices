@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <i18n baseKey="m.webservices.bo.general" lcid="fr_FR">
-  <key id="module-name">webservices</key>
-  <key id="tree-root-name">webservices</key>
-  <key id="system-folder-name">webservices</key>
-  <key id="compiled-succefully">Le web service "{label}" à été compilé avec succès</key>
-  <key id="compiled-error">Erreur lors de la compilation</key>
+	<key id="module-name">webservices</key>
+	<key id="tree-root-name">webservices</key>
+	<key id="system-folder-name">webservices</key>
+	<key id="compiled-succefully">Le web service "{label}" à été compilé avec succès</key>
+	<key id="compiled-error">Erreur lors de la compilation</key>
 </i18n>

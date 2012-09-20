@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <i18n baseKey="m.webservices.bo.actions" lcid="fr_FR">
-  <key id="create_">créer</key>
-  <key id="create-ws">créer un web service</key>
-  <key id="compile">compiler</key>
+	<key id="create_">créer</key>
+	<key id="create-ws">créer un webservice</key>
+	<key id="compile">compiler</key>
 </i18n>

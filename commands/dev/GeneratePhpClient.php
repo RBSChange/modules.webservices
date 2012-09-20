@@ -2,23 +2,23 @@
 class commands_GeneratePhpClient extends c_ChangescriptCommand
 {
 	/**
-	 * @return String
+	 * @return string
 	 */
-	function getUsage()
+	public function getUsage()
 	{
 		return "<className>";
 	}
 
 	/**
-	 * @return String
+	 * @return string
 	 */
-	function getDescription()
+	public function getDescription()
 	{
 		return "generate PHP client for a given webservice";
 	}
 
 	/**
-	 * @param String[] $params
+	 * @param string[] $params
 	 * @param array<String, String> $options where the option array key is the option name, the potential option value or true
 	 */
 	protected function validateArgs($params, $options)
@@ -27,11 +27,11 @@ class commands_GeneratePhpClient extends c_ChangescriptCommand
 	}
 
 	/**
-	 * @param String[] $params
+	 * @param string[] $params
 	 * @param array<String, String> $options where the option array key is the option name, the potential option value or true
 	 * @see c_ChangescriptCommand::parseArgs($args)
 	 */
-	function _execute($params, $options)
+	public function _execute($params, $options)
 	{
 		$className = $params[0];
 		$this->loadFramework();
@@ -41,8 +41,6 @@ class commands_GeneratePhpClient extends c_ChangescriptCommand
 			return $this->quitError("$className does not implement webservices_WebService interface");
 		}
 		
-
-
 		ob_start();
 		echo "<?php\n";
 echo '
@@ -155,7 +153,7 @@ if (!class_exists("cl_array", false))
 	/**
 	 * @param String \$endPoint the change webservice location (http[s]://<targetFQDN>/webservices/<moduleName>/<serviceName>)
 	 */
-	function __construct(\$endPoint) {
+	public function __construct(\$endPoint) {
 		\$this->endPoint = \$endPoint;
 		\$this->clientOptions = array('encoding' => 'utf-8', 'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP, 'trace' => true, 'features' => SOAP_SINGLE_ELEMENT_ARRAYS);
 		\$this->clientOptions['classmap'] = " . var_export($classmap, true) .";
@@ -164,14 +162,14 @@ if (!class_exists("cl_array", false))
 	/**
 	 * @param String \$login
 	 */
-	function setLogin(\$login) {
+	public function setLogin(\$login) {
 		\$this->clientOptions['login'] = \$login;
 	}
 	
 	/**
 	 * @param String \$password
 	 */
-	function setPassword(\$password) {
+	public function setPassword(\$password) {
 		\$this->clientOptions['password'] = \$password;
 	}
 	
@@ -180,14 +178,14 @@ if (!class_exists("cl_array", false))
 	 * @param String \$name
 	 * @param mixed \$value
 	 */
-	function setSoapOption(\$name, \$value) {
+	public function setSoapOption(\$name, \$value) {
 		\$this->clientOptions[\$name] = \$value;
 	}
 	
 	/**
 	 * @param \$otherChangeWebServiceClient
 	 */
-	function importChangeSession(\$otherChangeWebServiceClient) {
+	public function importChangeSession(\$otherChangeWebServiceClient) {
 		\$this->getSoapClient()->_cookies = \$otherChangeWebServiceClient->getSoapClient()->_cookies;
 		return;
 		/* FIXME: this code is not working .. ?
@@ -234,7 +232,7 @@ if (!class_exists("cl_array", false))
 			}
 			$comment = str_replace(array_keys($classmap) , array_values($classmap), $method->getDocComment());
 			echo "	".$comment."\n";
-			echo "	function ".$method->getName()."(".join(", ", $params).") {\n";
+			echo "	public function ".$method->getName()."(".join(", ", $params).") {\n";
 			echo "		return \$this->getSoapClient()->".$method->getName()."(new ".strtolower($className)."_".ucfirst($method->getName())."Param(".join(", ", $params)."))->".$method->getName()."Result;\n";
 			echo "	}\n\n";
 		}

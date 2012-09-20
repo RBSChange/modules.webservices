@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <script>
-  <binding fileName="modules/useractionlogger/persistentdocument/import/useractionlogger_binding.xml"/>
-  <actiondef modulename="webservices" actionname="activate.ws" label="m.webservices.bo.useractionlogger.activate-ws"/>
-  <actiondef modulename="webservices" actionname="deactivated.ws" label="m.webservices.bo.useractionlogger.deactivated-ws"/>
-  <actiondef modulename="webservices" actionname="reactivate.ws" label="m.webservices.bo.useractionlogger.reactivate-ws"/>
-  <actiondef modulename="webservices" actionname="delete.ws" label="m.webservices.bo.useractionlogger.delete-ws"/>
-  <actiondef modulename="webservices" actionname="insert.ws" label="m.webservices.bo.useractionlogger.insert-ws"/>
-  <actiondef modulename="webservices" actionname="update.ws" label="m.webservices.bo.useractionlogger.update-ws"/>
-  <actiondef modulename="webservices" actionname="savepermissions.rootfolder" label="m.webservices.bo.useractionlogger.savepermissions-rootfolder"/>
-  <actiondef modulename="webservices" actionname="move.ws" label="modules.webservices.bo.useractionlogger.move-ws"/>
+	<binding fileName="modules/useractionlogger/persistentdocument/import/useractionlogger_binding.xml" />
+	<actiondef modulename="webservices" actionname="activate.ws" label="m.webservices.bo.useractionlogger.activate-ws" />
+	<actiondef modulename="webservices" actionname="deactivated.ws" label="m.webservices.bo.useractionlogger.deactivated-ws" />
+	<actiondef modulename="webservices" actionname="reactivate.ws" label="m.webservices.bo.useractionlogger.reactivate-ws" />
+	<actiondef modulename="webservices" actionname="delete.ws" label="m.webservices.bo.useractionlogger.delete-ws" />
+	<actiondef modulename="webservices" actionname="insert.ws" label="m.webservices.bo.useractionlogger.insert-ws" />
+	<actiondef modulename="webservices" actionname="update.ws" label="m.webservices.bo.useractionlogger.update-ws" />
+	<actiondef modulename="webservices" actionname="savepermissions.rootfolder" label="m.webservices.bo.useractionlogger.savepermissions-rootfolder" />
+	<actiondef modulename="webservices" actionname="move.ws" label="modules.webservices.bo.useractionlogger.move-ws" />
 </script>

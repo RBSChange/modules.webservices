@@ -1,44 +1,16 @@
 <?php
 /**
- * @package modules.webservices.lib.services
+ * @package modules.webservices
+ * @method webservices_ModuleService getInstance()
  */
 class webservices_ModuleService extends ModuleBaseService
 {
 	/**
-	 * @var webservices_ModuleService
+	 * @param string $stringLine
 	 */
-	private static $instance = null;
-	
-	/**
-	 * 
-	 * @var string
-	 */
-	private $logFilePath;
-
-	/**
-	 * @return webservices_ModuleService
-	 */
-	public static function getInstance()
-	{
-		if (is_null(self::$instance))
-		{
-			self::$instance = new self();
-		}
-		return self::$instance;
-	}
-	
-	protected function __construct()
-	{
-		$this->logFilePath = f_util_FileUtils::buildWebeditPath('log', 'webservices', 'webservices.log');
-		if (!file_exists($this->logFilePath))
-		{
-			f_util_FileUtils::writeAndCreateContainer($this->logFilePath, gmdate('Y-m-d H:i:s')."\t Created");
-		}
-	}
-	
 	public function log($stringLine)
 	{
-		error_log("\n". gmdate('Y-m-d H:i:s')."\t".$stringLine, 3, $this->logFilePath);
+		change_LoggingService::getInstance()->namedLog($stringLine, 'webservices');
 	}
 
 	/**
@@ -46,7 +18,7 @@ class webservices_ModuleService extends ModuleBaseService
 	 * @param string $className
 	 * @return string
 	 */
-	function getWsdl($className)
+	public function getWsdl($className)
 	{
 		return f_util_FileUtils::read($this->getWsdlPath($className));
 	}
@@ -56,7 +28,7 @@ class webservices_ModuleService extends ModuleBaseService
 	 * @param string $className
 	 * @return string
 	 */
-	function getWsdlPath($className)
+	public function getWsdlPath($className)
 	{
 		$path = f_util_FileUtils::buildChangeBuildPath("wsdl", str_replace("_", DIRECTORY_SEPARATOR, $className) . ".wsdl");
 		if (Framework::inDevelopmentMode())
@@ -70,7 +42,7 @@ class webservices_ModuleService extends ModuleBaseService
 	/**
 	 * Compile all WSLD defined in the configuration
 	 */
-	function compileWsdls()
+	public function compileWsdls()
 	{
 		$wss = webservices_WsService::getInstance()->createQuery()->find();
 		foreach ($wss as $ws) 
@@ -82,9 +54,17 @@ class webservices_ModuleService extends ModuleBaseService
 	/**
 	 * @param string $className
 	 */
-	function compileWsdl($className)
+	public function compileWsdl($className)
 	{
-		Framework::info(__METHOD__ . " " . $className);
+		if (Framework::isInfoEnabled())
+		{
+			$this->log("Compile Wsdl for class: " . $className);
+		}
+		
+		$path = f_util_FileUtils::buildChangeBuildPath("wsdl", str_replace("_", DIRECTORY_SEPARATOR, $className) . '.types');
+		$types = $this->generateServiceTypeDefinitions($className);
+		f_util_FileUtils::writeAndCreateContainer($path, serialize($types), f_util_FileUtils::OVERRIDE);
+		
 		$path = f_util_FileUtils::buildChangeBuildPath("wsdl", str_replace("_", DIRECTORY_SEPARATOR, $className) . ".wsdl");
 		$wsdl = $this->generateWsdl($className);
 		f_util_FileUtils::writeAndCreateContainer($path, $wsdl, f_util_FileUtils::OVERRIDE);
@@ -102,7 +82,7 @@ class webservices_ModuleService extends ModuleBaseService
 		{
 			throw new Exception("$className does not implement webservices_WebService interface");
 		}
-		$baseWsdlPath = f_util_FileUtils::buildWebeditPath("modules", "webservices", "wsdefs", "WebServiceBase.wsdl");
+		$baseWsdlPath = f_util_FileUtils::buildProjectPath("modules", "webservices", "wsdefs", "WebServiceBase.wsdl");
 		$baseWsdl = f_util_FileUtils::read($baseWsdlPath);
 
 		$classInfo = explode("_", $className);
